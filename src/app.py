@@ -3,6 +3,7 @@ from flask import Flask
 from extensions import *
 from auth.controllers.user_controller import *
 from folders.controllers.folder_controller import *
+from tasks.controllers.task_controller import *
 
 # Flask
 # https://flask.palletsprojects.com/en/3.0.x/
@@ -27,8 +28,11 @@ api.add_resource(UserLogoutResource, "/users/api/v1/logout")
 api.add_resource(UserDetailsResource, "/users/api/v1/<user_id>")
 
 api.add_resource(CreateFolderResource, "/folders/api/v1/create")
-#api.add_resource(GetFolderByIdResource, "/folders/api/v1/detail/<folder_id>")
 api.add_resource(GetFoldersByUserIdResource, "/folders/api/v1/<user_id>")
+api.add_resource(FolderModifyResource, "/folders/api/v1/<folder_id>")
+
+api.add_resource(CreateTaskResource, "/tasks/api/v1")
+api.add_resource(TaskResource, "/tasks/api/v1/<task_id>")
 
 if __name__ == "__main__":
     app.run(debug=True)

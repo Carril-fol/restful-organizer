@@ -2,10 +2,10 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
-MONGO_URI = os.environ.get("MONGO_URI")
+MONGO_URI = os.getenv("MONGO_URI")
 
-CACHE_TYPE = os.environ.get("CACHE_TYPE")
+CACHE_TYPE = os.getenv("CACHE_TYPE")
 
-CACHE_DEFAULT_TIMEOUT = os.environ.get("CACHE_DEFAULT_TIMEOUT")
+CACHE_DEFAULT_TIMEOUT = os.getenv("CACHE_DEFAULT_TIMEOUT")

@@ -5,7 +5,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 
 from auth.services.user_service import UserService
 from auth.services.token_service import TokenService
-from auth.decorators.decorators import token_not_in_blacklist
+from auth.decorators.user_decorator import token_not_in_blacklist
 
 # Services
 user_service = UserService()

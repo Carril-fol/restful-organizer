@@ -2,14 +2,14 @@ from bson import ObjectId
 from database.db import Database
 from folders.models.folder_model import FolderModel
 
-class FolderDao(object):
+class FolderRepository(object):
     def __init__(self):
         self.__database = Database()
         self.folder_collection = self.__database.folder_collection()
 
     def create_folder(self, folder_instance_model: FolderModel):
-        folder_data_dict = folder_instance_model.model_dump(by_alias=True)
-        folder_created = self.folder_collection.insert_one(folder_data_dict)
+        folder_model_dump = folder_instance_model.model_dump(by_alias=True)
+        folder_created = self.folder_collection.insert_one(folder_model_dump)
         return folder_created.inserted_id
     
     def get_folder_by_id(self, folder_id: str):

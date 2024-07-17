@@ -20,3 +20,7 @@ class Database(object):
     def tokens_collection(self):
         collection = self.database["token_blacklisted"]
         return collection
+    
+    def tasks_collection(self):
+        collection = self.database["tasks"]
+        return collection
