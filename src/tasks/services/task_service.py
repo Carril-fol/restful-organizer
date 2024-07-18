@@ -16,6 +16,8 @@ class TaskService:
     def __check_if_task_exists_by_id(self, task_id: str):
         task_exists = self.task_repository.get_task_by_id(task_id)
         return task_exists if task_exists else False
+    
+    #TODO: Hacer una validacion si existe la carpeta ingresada.
 
     def detail_task(self, task_id: str):
         task_exists = self.__check_if_task_exists_by_id(task_id)
@@ -26,7 +28,7 @@ class TaskService:
         return task_format_json
 
     def create_task(self, data: dict):
-        folder_exists = self.folder_service.__check_if_folder_exists_by_id(data["folder_id"])
+        folder_exists = self.folder_service.check_if_folder_exists_by_id(data["folder_id"])
         if not folder_exists:
             raise FolderNotFound()
         task_instance_model = TaskModel(

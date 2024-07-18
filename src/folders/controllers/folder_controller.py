@@ -54,7 +54,7 @@ class CreateFolderResource(Resource):
 class GetFoldersByUserIdResource(Resource):
 
     @cache.cached(timeout=300)
-    @token_not_in_blacklist
+    @jwt_required(locations=["headers"])
     def get(self, user_id: str):
         """
         Example:
@@ -81,10 +81,20 @@ class GetFoldersByUserIdResource(Resource):
             return {"error": (str(error))}, 400
 
 
-class FolderModifyResource(Resource):
+class FolderResource(Resource):
+    method_decorators = [jwt_required(locations=["headers"])]
 
-    @jwt_required(locations=["headers"])
     @token_not_in_blacklist
+    @folder_is_from_the_user
+    def get(self, folder_id: str):
+        try:
+            folder = folder_service.detail_folder(folder_id)
+            return {"folder": folder}, 200
+        except Exception as error:
+            return {"error": (str(error))}, 400
+
+    @token_not_in_blacklist
+    @folder_is_from_the_user
     def put(self, folder_id: str):
         """
         Example:
@@ -121,9 +131,9 @@ class FolderModifyResource(Resource):
             return {"status": "Updated", "folder": folder_instance_update}, 200
         except Exception as error:
             return {"error": (str(error))}, 400
-        
-    @jwt_required(locations=["headers"])
+    
     @token_not_in_blacklist
+    @folder_is_from_the_user
     def delete(self, folder_id: str):
         """
         Example:

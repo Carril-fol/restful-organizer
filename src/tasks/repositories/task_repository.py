@@ -1,6 +1,6 @@
 from bson import ObjectId
 from database.db import Database
-from src.tasks.models.task_model import TaskModel
+from tasks.models.task_model import TaskModel
 
 class TaskRepository:
     def __init__(self):

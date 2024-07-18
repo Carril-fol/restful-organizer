@@ -24,3 +24,7 @@ class Database(object):
     def tasks_collection(self):
         collection = self.database["tasks"]
         return collection
+    
+    def events_collection(self):
+        collection = self.database["events"]
+        return collection

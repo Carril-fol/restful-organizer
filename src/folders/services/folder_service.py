@@ -9,12 +9,12 @@ class FolderService:
     def __init__(self):
         self.folder_repository = FolderRepository()
 
-    def __check_if_folder_exists_by_id(self, folder_id: str):
+    def check_if_folder_exists_by_id(self, folder_id: str):
         folder_instance = self.folder_repository.get_folder_by_id(folder_id)
         return folder_instance if folder_instance else False
 
-    def get_folder_by_id(self, folder_id: str):
-        folder_exists = self.__check_if_folder_exists_by_id(folder_id)
+    def detail_folder(self, folder_id: str):
+        folder_exists = self.check_if_folder_exists_by_id(folder_id)
         if not folder_exists:
             raise FolderNotFound()
         folder_model_dump_json = FolderModel.model_validate(folder_exists).model_dump_json()
@@ -32,7 +32,7 @@ class FolderService:
             user_id=ObjectId(data["user_id"])
         )
         folder_created = self.folder_repository.create_folder(folder_instance_model)
-        folder_format_json = self.get_folder_by_id(folder_created)
+        folder_format_json = self.detail_folder(folder_created)
         return folder_format_json
     
     def update_folder(self, folder_id: str, data: dict):
@@ -41,11 +41,11 @@ class FolderService:
             user_id=ObjectId(data["user_id"])
         )
         folder_updated = self.folder_repository.update_folder(folder_id, folder_instance_model)
-        folder_format_json = self.get_folder_by_id(folder_id)
+        folder_format_json = self.detail_folder(folder_id)
         return folder_format_json
     
     def delete_folder(self, folder_id: str):
-        folder_found = self.__check_if_folder_exists_by_id(folder_id)
+        folder_found = self.check_if_folder_exists_by_id(folder_id)
         if not folder_found:
             raise FolderNotFound()
         folder_instance_delete = self.folder_repository.delete_folder(folder_id)
