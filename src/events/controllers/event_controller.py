@@ -1,15 +1,20 @@
 from flask import request
 from flask_restful import Resource
+from flask_jwt_extended import jwt_required
 
 from extensions import cache
-from folders.exceptions.folder_exception import FolderNotFound
+from auth.decorators.user_decorator import is_token_blacklisted
+from folders.decorators.folder_decorator import is_folder_from_the_user
 from events.services.event_service import EventService
-from events.exceptions.event_exception import *
+from events.decorators.event_decorator import is_event_from_the_user
 
 event_service = EventService()
 
 class CreateEventResource(Resource):
-    
+    method_decorators = [jwt_required(locations=["headers"])]
+
+    @is_token_blacklisted
+    @is_folder_from_the_user
     def post(self, folder_id: str):
         """
         Example:
@@ -47,18 +52,16 @@ class CreateEventResource(Resource):
         data = request.get_json()
         if not data:
             return {"error": "Missing JSON in the request"}, 400
-        try:
-            event_created = event_service.create_event(folder_id,data)
-            event_detail_created = event_service.detail_event(event_created)
-            return {"status": "Created", "event": event_detail_created}, 201
-        except FolderNotFound as error:
-            return {"error": (str(error))}, 404
-        except Exception as error:
-            return {"error": (str(error))}, 400
+        event_created = event_service.create_event(folder_id,data)
+        event_detail_created = event_service.detail_event(event_created)
+        return {"status": "Created", "event": event_detail_created}, 201
 
 
 class EventResource(Resource):
-
+    method_decorators = [jwt_required(locations=["headers"])]
+    
+    @is_token_blacklisted
+    @is_event_from_the_user
     @cache.cached(timeout=300)
     def get(self, event_id: str):
         """
@@ -86,11 +89,11 @@ class EventResource(Resource):
         try:
             event_detail = event_service.detail_event(event_id)
             return {"event": event_detail}, 200
-        except EventNotFound as error:
-            return {"error": (str(error))}, 404
         except Exception as error:
             return {"error": (str(error))}, 400
-        
+
+    @is_token_blacklisted
+    @is_event_from_the_user
     def put(self, event_id: str):
         """
         Example:
@@ -130,20 +133,18 @@ class EventResource(Resource):
         }
         ```
         """
-        data = request.get_json()
-        if not data:
-            return {"error": "Missing JSON in the request."}, 400
         try:
+            data = request.get_json()
+            if not data:
+                return {"error": "Missing JSON in the request."}, 400
             event_update = event_service.update_event(event_id, data)
-            event_detail_updated = event_service.detail_event(event_update)
+            event_detail_updated = event_service.detail_event(event_id)
             return {"status": "Updated", "event": event_detail_updated}, 200
-        except EventNotFound as error:
-            return {"error": (str(error))}, 404
-        except FolderNotFound as error:
-            return {"error": (str(error))}, 404
         except Exception as error:
             return {"error": (str(error))}, 400
-        
+    
+    @is_token_blacklisted
+    @is_event_from_the_user
     def delete(self, event_id: str):
         """
         Example:
@@ -161,10 +162,5 @@ class EventResource(Resource):
         }
         ```
         """
-        try:
-            event_delete = event_service.delete_event(event_id)
-            return {"status": "Deleted"}, 200
-        except EventNotFound as error:
-            return {"error": (str(error))}, 404
-        except Exception as error:
-            return {"error": (str(error))}, 400
+        event_delete = event_service.delete_event(event_id)
+        return {"status": "Deleted"}, 200

@@ -1,8 +1,9 @@
 from flask_jwt_extended import get_jwt
 from functools import wraps
 from auth.services.token_service import TokenService
+from jwt.exceptions import ExpiredSignatureError
 
-def token_not_in_blacklist(fn):
+def is_token_blacklisted(fn):
     """
     Decorator that checks if the JWT token is blacklisted before executing the decorated function.
 
@@ -13,8 +14,7 @@ def token_not_in_blacklist(fn):
     Returns:
     -------
     function: The decorated function that first checks the status of the blacklisted token.
-    """
-    
+    """ 
     @wraps(fn)
     def wrapper(*args, **kwargs):
         try:
@@ -27,5 +27,5 @@ def token_not_in_blacklist(fn):
                 return {"error": "Token is already blacklisted"}, 400
             return fn(*args, **kwargs)
         except Exception as error:
-            return {"error": "Internal server error", "detail error": str(error)}, 500
+            return {"error": (str(error))}, 400
     return wrapper

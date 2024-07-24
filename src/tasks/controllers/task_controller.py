@@ -3,18 +3,18 @@ from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 
 from extensions import cache
-from auth.decorators.user_decorator import token_not_in_blacklist
-from folders.exceptions.folder_exception import *
+from auth.decorators.user_decorator import is_token_blacklisted
+from folders.decorators.folder_decorator import is_folder_from_the_user
 from tasks.services.task_service import TaskService
-from tasks.exceptions.task_exception import *
+from tasks.decorators.task_decorator import is_task_from_the_user
 
 task_service = TaskService()
 
-
 class CreateTaskResource(Resource):
+    method_decorators = [jwt_required(locations=["headers"])]
 
-    @jwt_required(locations=["headers"])
-    @token_not_in_blacklist
+    @is_token_blacklisted
+    @is_folder_from_the_user
     def post(self, folder_id: str):
         """
         Example:
@@ -50,20 +50,16 @@ class CreateTaskResource(Resource):
             return {"error": "Missing JSON in request"}, 400
         if not folder_id:
             return {"error": "Missing ID from the folder in the URL."}, 400
-        try:
-            task_created = task_service.create_task(folder_id, data)
-            return {"status": "Created", "task": task_created}, 201
-        except FolderNotFound as error:
-            return {"error": (str(error))}, 404
-        except Exception as error:
-            return {"error": (str(error))}, 400
+        task_created = task_service.create_task(folder_id, data)
+        return {"status": "Created", "task": task_created}, 201
         
 
 class TaskResource(Resource):
+    method_decorators = [jwt_required(locations=["headers"])]
     
+    @is_token_blacklisted
+    @is_task_from_the_user
     @cache.cached(timeout=300)
-    @jwt_required(locations=["headers"])
-    @token_not_in_blacklist
     def get(self, task_id: str):
         """
         Example:
@@ -86,16 +82,11 @@ class TaskResource(Resource):
         }
         ```
         """
-        try:
-            task_detail = task_service.detail_task(task_id)
-            return {"task": task_detail}, 200
-        except TaskNotExists as error:
-            return {"error": (str(error))}, 404
-        except Exception as error:
-            return {"error": (str(error))}, 400
+        task_detail = task_service.detail_task(task_id)
+        return {"task": task_detail}, 200
         
-    @jwt_required(locations=["headers"])
-    @token_not_in_blacklist
+    @is_token_blacklisted
+    @is_task_from_the_user
     def delete(self, task_id: str):
         """
         Example:
@@ -113,16 +104,11 @@ class TaskResource(Resource):
         }
         ```
         """
-        try:
-            task_deleted = task_service.delete_task(task_id)
-            return {"status": "Deleted"}, 200
-        except TaskNotExists as error:
-            return {"error": (str(error))}, 404
-        except Exception as error:
-            return {"error": (str(error))}, 400
-
-    @jwt_required(locations=["headers"])
-    @token_not_in_blacklist
+        task_deleted = task_service.delete_task(task_id)
+        return {"status": "Deleted"}, 200
+    
+    @is_token_blacklisted
+    @is_task_from_the_user
     def put(self, task_id: str):
         """
         Example:
@@ -151,10 +137,5 @@ class TaskResource(Resource):
         data = request.get_json()
         if not data:
             return {"error": "Missing JSON in the request"}, 200
-        try:
-            task_update = task_service.update_task(task_id, data)
-            return {"status": "Updated"}, 200
-        except TaskNotExists as error:
-            return {"error": (str(error))}, 404
-        except Exception as error:
-            return {"error": (str(error))}, 400
+        task_update = task_service.update_task(task_id, data)
+        return {"status": "Updated"}, 200

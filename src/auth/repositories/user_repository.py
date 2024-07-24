@@ -4,7 +4,7 @@ from pymongo.results import InsertOneResult, UpdateResult
 from database.db import Database
 from auth.models.user_model import UserModel
 
-class UserDao:
+class UserRepository:
     def __init__(self):
         """
         Initializes the UserDao instance.

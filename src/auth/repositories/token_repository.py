@@ -2,7 +2,7 @@ from pymongo.results import InsertOneResult
 from auth.models.token_model import TokenModel
 from database.db import Database
 
-class TokenDao(object):
+class TokenRepository(object):
     def __init__(self):
         """
         Initializes the TokenRepository instance.

@@ -53,7 +53,7 @@ class EventRepository:
         
         Attributes:
         ----------
-        event_id (dtr): A text string representing the ID of an event.
+        event_id (str): A text string representing the ID of an event.
         data (dict): A dictionary with the new data for the event.
 
         Returns:
@@ -61,11 +61,56 @@ class EventRepository:
         The id inserted in the data collection.
         """
         event_filter_dict = {"_id": ObjectId(event_id)}
-        event_new_data_dict = {"$set": data}
+        event_new_data_dict = {
+            "$set": data
+        }
         event_updated = self.event_collection.update_one(event_filter_dict, event_new_data_dict)
         return event_updated.upserted_id
     
     def delete_event(self, event_id: str):
+        """
+        Allows to delete a event based on they ID.
+        
+        Attributes:
+        ----------
+        event_id (str): A text string representing the ID of an event.
+
+        Returns:
+        -------
+        The id inserted in the data collection.
+        """
         event_filter_dict = {"_id": ObjectId(event_id)}
         event_delete = self.event_collection.delete_one(event_filter_dict)
         return event_delete
+
+    def get_events_by_folder_id(self, folder_id: str):
+        """
+        Allows you to make a query to the database to return the events that contain the folder_id.
+        
+        Attributes:
+        ----------
+        folder_id (str): A text string representing the ID of an folder.
+
+        Returns:
+        -------
+        returns dictionaries of the events that contain the folder_id.
+        """
+        event_filter_dict = {"folder_id": ObjectId(folder_id)}
+        events = self.event_collection.find(event_filter_dict)
+        return events
+    
+    def delete_events_by_folder_id(self, folder_id: str):
+        """
+        Allows to delete events by they folder_id.
+        
+        Attributes:
+        ----------
+        folder_id (str): A text string representing the ID of an folder.
+
+        Returns:
+        -------
+        returns a instance "DeleteResult" from PyMongo 
+        """
+        event_data_filter = {"folder_id": ObjectId(folder_id)}
+        events_deleted = self.event_collection.delete_many(event_data_filter)
+        return events_deleted

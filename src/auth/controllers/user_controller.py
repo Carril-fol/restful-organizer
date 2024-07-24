@@ -1,16 +1,15 @@
-import json
 from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt
 
 from auth.services.user_service import UserService
 from auth.services.token_service import TokenService
-from auth.decorators.user_decorator import token_not_in_blacklist
+from auth.decorators.user_decorator import is_token_blacklisted
+from auth.exceptions.user_exceptions import UserAlreadyExists, UserNotFoundException, PasswordDontMatch
+from auth.exceptions.token_exceptions import TokenAlreadyBlacklisted
 
-# Services
 user_service = UserService()
 token_service = TokenService()
-
 
 class UserRegisterResource(Resource):
     """
@@ -28,7 +27,7 @@ class UserRegisterResource(Resource):
         "confirm_password": "Confirmation from the password"
     }
 
-    Successful response (code 201 - Created):
+    Successful response (code 201 - CREATED):
     {   
         "msg": "User created",
         "user": {
@@ -42,7 +41,7 @@ class UserRegisterResource(Resource):
         "access_token": "8uP9dv0czfTLY8WEma1fZyBYLzUedsXiwp31A4wQ6klpJclPYQyZDsFruLuybCd9..."
     }
 
-    Response with validation errors (code 400 - Bad Request):
+    Response with validation errors (code 400 - BAD REQUEST):
     {
         "email": ["This field has to be unique"],
         "password": ["Password must contain at least one number."],
@@ -55,17 +54,12 @@ class UserRegisterResource(Resource):
         if not data:
             return {"error": "Missing JSON in request"}, 400       
         try:
-            new_user = user_service.create_user(
-                data["first_name"],
-                data["last_name"],
-                data["email"],
-                data["password"],
-                data["confirm_password"]
-            )
-            get_user_created = user_service.get_user_by_id(new_user)
-            response_user_data = json.loads(get_user_created)
-            access_token = create_access_token(response_user_data)
-            return {"msg": "User created", "user": response_user_data, "access_token": access_token}, 201
+            new_user = user_service.create_user(data)
+            user_json = user_service.get_user_by_id(new_user)
+            access_token = create_access_token(user_json)
+            return {"msg": "User created", "user": user_json, "access_token": access_token}, 201
+        except UserAlreadyExists as error:
+            return {"error": (str(error))}, 400
         except Exception as error:
             return {"error": (str(error))}, 400
 
@@ -101,14 +95,15 @@ class UserLoginResource(Resource):
         data = request.get_json()
         if not data:
             return {"error": "Missing JSON in request"}, 400
-        email = data["email"]
-        password = data["password"]
         try:
-            user_exists = user_service.authenticate_user(email, password)
-            response_user_data = json.loads(user_exists)
-            refresh_token = create_refresh_token(response_user_data)
-            access_token = create_access_token(response_user_data)
+            user_exists = user_service.authenticate_user(data)
+            refresh_token = create_refresh_token(user_exists)
+            access_token = create_access_token(user_exists)
             return {"msg": "Login succefully", "tokens": { "access_token": access_token, "refresh_token": refresh_token}}, 200
+        except PasswordDontMatch as error:
+            return {"error": (str(error))}, 400
+        except UserNotFoundException as error:
+            return {"error": (str(error))}, 404
         except Exception as error:
             return {"error": (str(error))}, 400
 
@@ -142,14 +137,15 @@ class UserDetailsResource(Resource):
     ```
     """
     @jwt_required(locations=["headers"], optional=False)
-    @token_not_in_blacklist
+    @is_token_blacklisted
     def get(self, user_id: str):
         if not user_id:
             return {"error": "Not data in URL"}, 400
         try:
             user_exists = user_service.get_user_by_id(user_id)
-            response_user_data = json.loads(user_exists)
-            return {"user": response_user_data}, 200
+            return {"user": user_exists}, 200
+        except UserNotFoundException as error:
+            return {"error": (str(error))}, 404
         except Exception as error:
             return {"error": (str(error))}, 400
         
@@ -182,5 +178,7 @@ class UserLogoutResource(Resource):
             token_jti = get_jwt().get("jti")
             blacklist_token = token_service.blacklist_token(token_jti)
             return {"msg": "Logout succesfully"}, 200
+        except TokenAlreadyBlacklisted as error:
+            return {"error": (str(error))}, 400
         except Exception as error:
-            return {"error": str(error)}, 400
+            return {"error": (str(error))}, 400
