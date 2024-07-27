@@ -48,11 +48,7 @@ class FolderService:
         return folder_format_json
     
     def update_folder(self, folder_id: str, data: dict):
-        folder_instance_model = FolderModel(
-            name_folder=data["name_folder"],
-            user_id=ObjectId(data["user_id"])
-        )
-        folder_updated = self.folder_repository.update_folder(folder_id, folder_instance_model)
+        folder_updated = self.folder_repository.update_folder(folder_id, data)
         folder_format_json = self.detail_folder(folder_id)
         return folder_format_json
     

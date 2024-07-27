@@ -24,12 +24,19 @@
 
 - [Features](#features)
 - [Tech used](#tech-used)
-- [How to get the project](#how-to-get-the-project)
-- [Deploy the project in render](#deploy-in-render)
-- [Run the project using docker](#run-the-project-using-docker) 
-- [API endpoints](#api-endpoints) 
+- [How to get the project:](#how-to-get-the-project)
+    - [Using Git (recommended)](#using-git-recommended)
+    - [Using manual download ZIP](#using-manual-download-zip)
+    - [Using docker](#using-docker)
+- [Deploy in render:](#deploy-in-render)
+- [API endpoints:](#api-endpoints)
+    - [*Indication*](#indication)
+  - [User related](#user-related)
+  - [Folders related](#folders-related)
+  - [Events related](#events-related)
+  - [Tasks related](#tasks-related)
 
-## Features:
+## Features
 
 - Register account: Users can register their accounts.
 - Login account: Users can log in their accounts.
@@ -50,10 +57,10 @@
 - Update events: Users can modify their events.
 - Delete events: Users can delete their events.
 
-## Tech used:
+## Tech used 
 
 **Programming language**
-- [x] Python
+- [x] Python 
 
 **Framework**
 - [x] Flask
@@ -61,6 +68,8 @@
 **Database**
 - [x] MongoDB
 
+**Container**
+- [x] Docker
 
 ## How to get the project:
 #### Using Git (recommended)
@@ -77,17 +86,17 @@ git clone https://github.com/Carril-fol/restful-organizer.git
 1. Open Docker Desktop
 2. Navigate & open CLI of your preference & use this command.
 ```bash
-docker pull carrilfol/restful-inventory-management-system
+docker pull carrilfol/restful-organizer
 ```
 3. Now you need to run the image you just downloaded in docker, with the following command
 ```bash
-docker run -p [PORT TO EXPOSE]:5000 carrilfol/restful-inventory-management-system
+docker run -p [PORT TO EXPOSE]:5000 carrilfol/restful-organizer
 ```
 
 ## Deploy in render:
 You can access the live version of the application here (this can be a bit burdensome since the server has to be initialized): 
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://restful-inventory-management-system.onrender.com)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://restful-organizer.onrender.com)
 
 ## API endpoints:
 
@@ -100,21 +109,23 @@ You can access the live version of the application here (this can be a bit burde
 - [ ] [Login](docs/auth/UserLoginResource.md): `POST localhost:[PORT]/users/api/v1/login`
 - [x] [Logout](docs/auth/UserLogoutResource.md): `POST localhost:[PORT]/users/api/v1/logout`
 - [x] [Get user info](docs/auth/UserDetailsResource.md): `GET localhost:[PORT]/users/api/v1/<user_id>`
+- [x] [Refresh token](docs/auth/RefreshTokenResource.md): `POST localhost:[POST]/users/api/v1/refresh`
 
-### Categories related
-- [x] [Create a category](docs/categories/CategoryCreateResource.md): `POST localhost:[PORT]/categories/api/v1/create`
-- [x] [Detail from a category](docs/categories/CategoryDetailByNameResource.md): `GET localhost:[PORT]/categories/api/v1/<name>`
-- [x] [Get all categories](docs/categories/CategoryAllDetailResource.md): `GET localhost:[PORT]/categories/api/v1/all`
-- [x] [Delete a category](docs/categories/CategoryDeleteResource.md): `POST localhost:[PORT]/categories/api/v1/delete/<category_id>`
-- [x] [Update a category](docs/categories/CategoryUpdateResource.md): `PUT localhost:[PORT]/categories/api/v1/update/<category_id>`
+### Folders related
+- [x] [Create a folder](docs/folders/CreateFolderResource.md): `POST localhost:[PORT]/folders/api/v1/create`
+- [x] [Get all folder from a user](docs/folders/GetFoldersByUserIdResource.md): `GET localhost:[PORT]/folders/api/v1/user/<user_id>`
+- [x] [Detail from a folder](docs/folders/FolderResource.md): `GET localhost:[PORT]/folders/api/v1/<folder_id>`
+- [x] [Delete a folder](docs/folders/FolderResource.md): `DELETE localhost:[PORT]/folders/api/v1/<folder_id>`
+- [x] [Update a folder](docs/folders/FolderResource.md): `PUT localhost:[PORT]/folders/api/v1/<folder_id>`
 
-### Products related
-- [x] [Create a product](docs/products/ProductCreateResource.md): `POST localhost:[PORT]/product/api/v1/create`
-- [x] [Get details from a product](docs/products/ProductDetailByIdResource.md.md): `GET localhost:[PORT]/product/api/v1/detail/<product_id>`
-- [x] [Update a product](docs/products/ProductUpdateResource.md): `PUT localhost:[PORT]/product/api/v1/update/<product_id>`
-- [x] [Delete a product](docs/products/.md): `DELETE localhost:[PORT]/product/api/v1/delete/<product_id>`
+### Events related
+- [x] [Create a event](docs/events/CreateTaskResource.md): `POST localhost:[PORT]/events/api/v1/<folder_id>`
+- [x] [Details from a event](docs/events/TaskResource.md): `GET localhost:[PORT]/events/api/v1/<event_id>`
+- [x] [Update a event](docs/events/TaskResource.md): `PUT localhost:[PORT]/events/api/v1/<event_id>`
+- [x] [Delete a event](docs/events/TaskResource.md): `DELETE localhost:[PORT]/events/api/v1/<event_id>`
 
-### Products Detail related
-- [x] [Create product details](docs/products/products_details/ProductDetailCreateResource.md): `POST localhost:[PORT]/product/detail/api/v1/create`
-- [x] [Get detailed information about the products](docs/products/products_details/ProductDetailGetResource.md): `GET localhost:[PORT]/product/detail/api/v1/<barcode>`
-- [x] [Delete a detail from the products](docs/products/products_details/ProductDetailDeleteResource.md): `PUT localhost:[PORT]/product/detail/delete/api/v1/<barcode>`
+### Tasks related
+- [x] [Create a task](docs/tasks/CreateTaskResource.md): `POST localhost:[PORT]/tasks/api/v1/<folder_id>`
+- [x] [Detail from a tasks](docs/tasks/TaskResource.md): `GET localhost:[PORT]/tasks/api/v1/<task_id>/`
+- [x] [Update a task](docs/tasks/TaskResource.md): `PUT localhost:[PORT]/tasks/api/v1/<task_id>`
+- [x] [Delete a task](docs/tasks/TaskResource.md): `DELETE localhost:[PORT]/tasks/api/v1/<task_id>`

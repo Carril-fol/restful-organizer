@@ -2,7 +2,7 @@ import cherrypy as server
 from flask import Flask
 from flask_restful import Api
 
-from extensions import cache, jwt, api
+from utils.extensions import cache, jwt, api
 from settings import SERVER_SOCKET_HOST, SERVER_SOCKET_PORT
 from auth.controllers.user_controller import *
 from auth.controllers.token_controller import RefreshTokenResource
@@ -31,7 +31,6 @@ api.add_resource(UserRegisterResource, "/users/api/v1/register")
 api.add_resource(UserLoginResource, "/users/api/v1/login")
 api.add_resource(UserLogoutResource, "/users/api/v1/logout")
 api.add_resource(UserDetailsResource, "/users/api/v1/<user_id>")
-
 api.add_resource(RefreshTokenResource, "/users/api/v1/refresh")
 
 api.add_resource(CreateFolderResource, "/folders/api/v1/create")
@@ -45,10 +44,6 @@ api.add_resource(CreateEventResource, "/events/api/v1/<folder_id>")
 api.add_resource(EventResource, "/events/api/v1/<event_id>")
 
 if __name__ == "__main__":
-    app.run(debug=True)
-
-
-"""
     server.tree.graft(app, "/")
     server.config.update(
         {
@@ -58,4 +53,3 @@ if __name__ == "__main__":
     )
     server.engine.start()
     server.engine.block()
-"""

@@ -1,6 +1,6 @@
 from bson import ObjectId
 from database.db import Database
-from events.models.event_model import EventModel
+from events.models.event_model import EventModel, EventCreationModel
 
 class EventRepository:
     def __init__(self):
@@ -15,19 +15,19 @@ class EventRepository:
         self.__database = Database()
         self.event_collection = self.__database.events_collection()
     
-    def create_event(self, event_instance_model: EventModel):
+    def create_event(self, event_creation_instance_model: EventCreationModel):
         """
         Formats the input model instance to a dictionary and inserts it into the corresponding collection of events.
 
         Attributes:
         ----------
-        event_instance_model (EventModel): An instance from "EventModel".
+        event_creation_instance_model (EventCreationModel): An instance from "EventCreationModel".
 
         Returns:
         -------
         The id inserted in the data collection
         """
-        event_model_dump = event_instance_model.model_dump(by_alias=True)
+        event_model_dump = event_creation_instance_model.model_dump(by_alias=True)
         event_inserted = self.event_collection.insert_one(event_model_dump)
         return event_inserted.inserted_id
     

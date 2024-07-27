@@ -2,7 +2,7 @@ from flask import request
 from flask_restful import Resource
 from flask_jwt_extended import jwt_required
 
-from extensions import cache
+from utils.extensions import cache
 from auth.decorators.user_decorator import is_token_blacklisted
 from folders.decorators.folder_decorator import is_folder_from_the_user, is_user_authorized_to_see_folders
 from folders.services.folder_service import FolderService
@@ -53,7 +53,7 @@ class GetFoldersByUserIdResource(Resource):
     
     @is_token_blacklisted
     @is_user_authorized_to_see_folders
-    @cache.cached(timeout=300)
+    @cache.cached(timeout=60)
     def get(self, user_id: str):
         """
         Example:
@@ -82,7 +82,6 @@ class FolderResource(Resource):
 
     @is_token_blacklisted
     @is_folder_from_the_user
-    @cache.cached(timeout=300)
     def get(self, folder_id: str):
         """
         Example:

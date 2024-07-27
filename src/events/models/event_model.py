@@ -20,7 +20,9 @@ class EventModel(BaseModel):
             ObjectId: str
         }
 
-"""
+
+class EventCreationModel(EventModel):
+
     @field_validator("start_date")
     def valid_start_date(cls, value):
         date_today = datetime.now().date()
@@ -36,4 +38,9 @@ class EventModel(BaseModel):
         if end_date_format_date < date_today:
             raise EventEndDateException()
         return value
-"""
+
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {
+            ObjectId: str
+        }

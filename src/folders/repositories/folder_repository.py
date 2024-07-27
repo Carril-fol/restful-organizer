@@ -22,12 +22,10 @@ class FolderRepository(object):
         folders_from_the_user = self.folder_collection.find(user_data_dict)
         return folders_from_the_user
     
-    def update_folder(self, folder_id: str, folder_instance_model: FolderModel):
+    def update_folder(self, folder_id: str, data: dict):
         folder_dict_id = {"_id": ObjectId(folder_id)}
         folder_dict_data = {
-            "$set": {
-                "name_folder": folder_instance_model.name_folder
-            }
+            "$set": data
         }
         folder_update_instance = self.folder_collection.update_one(folder_dict_id, folder_dict_data)
         return folder_update_instance

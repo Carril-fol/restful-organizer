@@ -1,10 +1,9 @@
 import json
 from bson import ObjectId
 
-from folders.exceptions.folder_exception import *
 from events.repositories.event_repository import EventRepository
-from events.exceptions.event_exception import *
-from events.models.event_model import EventModel
+from events.exceptions.event_exception import EventNotFound
+from events.models.event_model import EventModel, EventCreationModel
 
 
 class EventService:
@@ -70,7 +69,7 @@ class EventService:
         -------
         event_created: The id inserted in the data collection.
         """
-        event_instance_model = EventModel(
+        event_instance_model = EventCreationModel(
             name_event=data["name_event"],
             folder_id=ObjectId(folder_id),
             localization=data["localization"],
