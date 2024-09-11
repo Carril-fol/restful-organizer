@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 from settings import MONGO_URI
 load_dotenv()
 
@@ -12,8 +13,8 @@ class Database(object):
         self.client: Instance of MongoClient.
         self.database: Client instance that represents the database.
         """
-        self.__uri = MONGO_URI
-        self.client = MongoClient(self.__uri)
+        self._uri = MONGO_URI
+        self.client = MongoClient(self._uri, server_api=ServerApi("1"))
         self.database = self.client["restful-organizer"]
 
     def folder_collection(self):
