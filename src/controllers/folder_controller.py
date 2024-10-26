@@ -15,7 +15,7 @@ folder_blueprint = Blueprint("folder", __name__, url_prefix="/folders/api/v1")
 folder_service = FolderService()
 
 @folder_blueprint.route("/create", methods=["POST"])
-@jwt_required(optional=False)
+@jwt_required()
 @is_token_blacklisted
 def create_folder():
     """
@@ -51,10 +51,10 @@ def create_folder():
     response = folder_service.create_folder(data, user_data_in_token)
     return {"status": "Created"}, 201
 
+@folder_blueprint.route("/", methods=["GET"])
 @jwt_required()
 @is_token_blacklisted
 @cache.cached(timeout=60)
-@folder_blueprint.route("/", methods=["GET"])
 async def get_folders_from_user():
     """
     Example:
@@ -78,10 +78,10 @@ async def get_folders_from_user():
     response = await folder_service.get_folders_from_user(user_data_from_token)
     return {"folders": response}, 200
 
+@folder_blueprint.route("/detail/<folder_id>", methods=["GET"])
 @jwt_required()
 @is_token_blacklisted
 @is_folder_from_the_user
-@folder_blueprint.route("/detail/<folder_id>", methods=["GET"])
 async def detail_folder(folder_id: str):
     """
     Example:
@@ -132,11 +132,11 @@ async def detail_folder(folder_id: str):
     except Exception as error:
         return {"error": str(error)}, 400
 
+@folder_blueprint.route("/update/<folder_id>", methods=["PUT", "PATCH"])
 @jwt_required()
 @is_token_blacklisted
 @is_folder_from_the_user
-@folder_blueprint.route("/update/<folder_id>", methods=["POST"])
-def update_folder(folder_id: str):
+async def update_folder(folder_id: str):
     """
     Example:
 
@@ -144,8 +144,7 @@ def update_folder(folder_id: str):
     ```
     Application data:
     {
-        "name_folder": "Name for the folder",
-        "user_id": "Id from the user"
+        "name_folder": "Name for the folder"
     }
 
     Successful response (Code 200 - OK):
@@ -164,17 +163,19 @@ def update_folder(folder_id: str):
     }
     ```
     """
+    user_data_in_token = get_jwt_identity()
+    print(user_data_in_token)
     data = request.get_json()
     if not data:
         return {"error": "Missing JSON in the request"}
-    response = folder_service.update_folder(folder_id, data)
+    response = await folder_service.update_folder(user_data_in_token, folder_id, data)
     return {"status": "Updated"}, 200
 
+@folder_blueprint.route("/delete/<folder_id>", methods=["DELETE"])
 @jwt_required()
 @is_token_blacklisted
 @is_folder_from_the_user
-@folder_blueprint.route("/delete/<folder_id>", methods=["DELETE"])
-def delete_folder(folder_id: str):
+async def delete_folder(folder_id: str):
     """
     Example:
 
@@ -191,5 +192,5 @@ def delete_folder(folder_id: str):
     }
     ```
     """
-    response = folder_service.delete_folder(folder_id)
+    response = await folder_service.delete_folder(folder_id)
     return {"status": "Deleted"}, 200
