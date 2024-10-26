@@ -4,8 +4,8 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 
 from services.user_service import UserService
 from services.token_service import TokenService
-from decorators.user_decorator import is_token_blacklisted
 from exceptions.user_exceptions import UserNotFoundException
+from decorators.user_decorator import is_token_blacklisted
 
 # Blueprint
 auth_blueprint = Blueprint("users", __name__, url_prefix="/users/api/v1")
@@ -111,8 +111,9 @@ async def login():
         return {"error": (str(error))}, 400
     
 
+@jwt_required()
+@is_token_blacklisted
 @auth_blueprint.route("/detail", methods=["GET"])
-@jwt_required(optional=False)
 async def detail_user_requested():
     """
     Example:
@@ -151,8 +152,8 @@ async def detail_user_requested():
         return {"error": (str(error))}, 400
 
 
-@auth_blueprint.route("/logout", methods=["POST"])
 @jwt_required(optional=False)
+@auth_blueprint.route("/logout", methods=["POST"])
 async def logout():
     """
     Example:
@@ -183,8 +184,8 @@ async def logout():
         return {"error": (str(error))}, 400
 
 
-@auth_blueprint.route("/refresh", methods=["POST"])
 @jwt_required(verify_type=True, refresh=True)
+@auth_blueprint.route("/refresh", methods=["POST"])
 def refresh_token():
     """
     Example:
