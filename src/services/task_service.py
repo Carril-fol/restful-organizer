@@ -43,7 +43,11 @@ class TaskService:
         A list of dictionaries with the task information.
         """
         tasks_from_database = await self.task_repository.get_tasks_by_folder_id(folder_id)
-        tasks_formated = [json.loads(TaskModel.model_validate(task).model_dump_json(by_alias=True)) for task in tasks_from_database]
+        tasks_formated = [
+            json.loads(
+                TaskModel.model_validate(task).model_dump_json(by_alias=True)
+            ) for task in tasks_from_database
+        ]
         return tasks_formated
 
     def detail_task(self, task_id: str):
@@ -139,7 +143,7 @@ class TaskService:
         task_update = self.task_repository.update_task(task_id, data)
         return task_update
     
-    def delete_tasks(self, folder_id: str):
+    async def delete_tasks(self, folder_id: str):
         """
         Allows to delete all tasks by folder_id.
 
@@ -151,5 +155,5 @@ class TaskService:
         -------
         A instance from "DeleteResult".
         """
-        tasks_deleted = self.task_repository.delete_tasks_by_folder_id(folder_id)
+        tasks_deleted = await self.task_repository.delete_tasks_by_folder_id(folder_id)
         return tasks_deleted 
