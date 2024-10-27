@@ -30,6 +30,13 @@ class FolderService:
             FolderModel.model_validate(folder_instance).model_dump_json(by_alias=True)
         )
         return response_json
+    
+    def _format_data_in_model(self, data: dict, user):
+        folder = FolderModel(
+            name_folder=data.get("name_folder"),
+            user_id=ObjectId(user)
+        )
+        return folder
         
     def check_if_folder_exists_by_id(self, folder_id: str) -> FolderModel | bool:
         folder_instance = self.folder_repository.get_folder_by_id(folder_id)
@@ -37,10 +44,7 @@ class FolderService:
     
     def create_folder(self, data: dict, user_data_in_token: dict):
         user = self._get_user_id_requested(user_data_in_token)
-        folder_model = FolderModel(
-            name_folder=data["name_folder"],
-            user_id=ObjectId(user)
-        )
+        folder_model = self._format_data_in_model(data, user)
         folder_created = self.folder_repository.create_folder(folder_model)
         return folder_created
     
@@ -64,15 +68,20 @@ class FolderService:
         list_of_folders = self._list_of_folders_in_format_json(folders)
         return list_of_folders
     
-    async def update_folder(self, folder_id: str, data: dict):
-        folder_updated = await self.folder_repository.update_folder(folder_id, data)
+    async def update_folder(self, user_data_from_token: dict, folder_id: str, data: dict):
+        user = self._get_user_id_requested(user_data_from_token)
+        folder = self.check_if_folder_exists_by_id(folder_id)
+        if not folder:
+            raise FolderNotFound()
+        folder_with_new_data = self._format_data_in_model(data, user)
+        folder_updated = await self.folder_repository.update_folder(folder_id, folder_with_new_data)
         return folder_updated
     
     async def delete_folder(self, folder_id: str):
-        folder_instance = self.check_if_folder_exists_by_id(folder_id)
-        if not folder_instance:
+        folder = self.check_if_folder_exists_by_id(folder_id)
+        if not folder:
             raise FolderNotFound()
-        tasks_deleted = self.event_service.delete_events(folder_id)
-        events_deleted = self.task_service.delete_tasks(folder_id)
-        folder_deleted = self.folder_repository.delete_folder(folder_id)
+        tasks_deleted = await self.event_service.delete_events(folder_id)
+        events_deleted = await self.task_service.delete_tasks(folder_id)
+        folder_deleted = await self.folder_repository.delete_folder(folder_id)
         return folder_deleted
