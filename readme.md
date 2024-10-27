@@ -52,11 +52,6 @@
 - Update tasks: Users can modify their task.
 - Delete tasks: Users can delete their task.
 
-- Create events: Users can create events related to a folder to maintain organization.
-- Read events: Users can get detail from their events.
-- Update events: Users can modify their events.
-- Delete events: Users can delete their events.
-
 ## Tech used 
 
 **Programming language**
@@ -117,12 +112,6 @@ You can access the live version of the application here (this can be a bit burde
 - [x] [Detail from a folder](docs/folders/FolderResource.md): `GET localhost:[PORT]/folders/api/v1/<folder_id>`
 - [x] [Delete a folder](docs/folders/FolderResource.md): `DELETE localhost:[PORT]/folders/api/v1/<folder_id>`
 - [x] [Update a folder](docs/folders/FolderResource.md): `PUT localhost:[PORT]/folders/api/v1/<folder_id>`
-
-### Events related
-- [x] [Create a event](docs/events/CreateTaskResource.md): `POST localhost:[PORT]/events/api/v1/<folder_id>`
-- [x] [Details from a event](docs/events/TaskResource.md): `GET localhost:[PORT]/events/api/v1/<event_id>`
-- [x] [Update a event](docs/events/TaskResource.md): `PUT localhost:[PORT]/events/api/v1/<event_id>`
-- [x] [Delete a event](docs/events/TaskResource.md): `DELETE localhost:[PORT]/events/api/v1/<event_id>`
 
 ### Tasks related
 - [x] [Create a task](docs/tasks/CreateTaskResource.md): `POST localhost:[PORT]/tasks/api/v1/<folder_id>`
