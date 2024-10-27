@@ -100,7 +100,7 @@ class TaskRepository:
         tasks_founds = self.task_collection.find(task_data_filter)
         return tasks_founds
     
-    def delete_tasks_by_folder_id(self, folder_id: str):
+    async def delete_tasks_by_folder_id(self, folder_id: str):
         """
         Allows to delete tasks by they folder_id.
         
