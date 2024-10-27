@@ -23,15 +23,14 @@ class FolderRepository(object):
         folders_from_the_user = self.folder_collection.find(user_data_dict)
         return folders_from_the_user
     
-    async def update_folder(self, folder_id: str, data: dict):
-        folder_dict_id = {"_id": ObjectId(folder_id)}
-        folder_dict_data = {
-            "$set": data
-        }
-        folder_update_instance = self.folder_collection.update_one(folder_dict_id, folder_dict_data)
+    async def update_folder(self, folder: dict, folder_with_new_data: FolderModel):
+        folder_dict_id = {"_id": ObjectId(folder.get("id"))}
+        folder_dict = folder_with_new_data.model_dump(by_alias=True)
+        folder_update_instance = self.folder_collection.update_one(folder_dict_id, folder_dict)
         return folder_update_instance
     
-    def delete_folder(self, folder_id: str):
+    async def delete_folder(self, folder: dict):
+        folder_id = folder.get("id")
         folder_dict_id = {"_id": ObjectId(folder_id)}
         folder_delete_instance = self.folder_collection.delete_one(folder_dict_id)
         return folder_delete_instance
