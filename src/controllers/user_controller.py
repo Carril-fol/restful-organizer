@@ -1,6 +1,12 @@
 # Imports
 from flask import Blueprint, request
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    jwt_required,
+    get_jwt_identity,
+    get_jwt,
+)
 
 from services.user_service import UserService
 from services.token_service import TokenService
@@ -13,6 +19,7 @@ auth_blueprint = Blueprint("users", __name__, url_prefix="/users/api/v1")
 # Services
 user_service = UserService()
 token_service = TokenService()
+
 
 @auth_blueprint.route("/register", methods=["POST"])
 async def register():
@@ -32,7 +39,7 @@ async def register():
     }
 
     Successful response (code 201 - CREATED):
-    {   
+    {
         "msg": "User created",
         "user": {
             "id": "Id from the user",
@@ -55,14 +62,18 @@ async def register():
     """
     data = request.get_json()
     if not data:
-        return {"error": "Missing JSON in request"}, 400       
+        return {"error": "Missing JSON in request"}, 400
     try:
         new_user = await user_service.create_user(data)
         user_json = await user_service.get_user_by_id(new_user)
         access_token = create_access_token(user_json)
-        return {"msg": "User created", "user": user_json, "access_token": access_token}, 201
+        return {
+            "msg": "User created",
+            "user": user_json,
+            "access_token": access_token,
+        }, 201
     except Exception as error:
-        return {"error": (str(error))}, 400 
+        return {"error": (str(error))}, 400
 
 
 @auth_blueprint.route("/login", methods=["POST"])
@@ -100,16 +111,13 @@ async def login():
         user_exists = await user_service.authenticate_user(data)
         refresh_token = create_refresh_token(user_exists)
         access_token = create_access_token(user_exists)
-        tokens = {
-            "access_token": access_token, 
-            "refresh_token": refresh_token
-        }
+        tokens = {"access_token": access_token, "refresh_token": refresh_token}
         return {"msg": "Login succefully", "tokens": tokens}, 200
     except UserNotFoundException as error:
         return {"error": (str(error))}, 404
     except Exception as error:
         return {"error": (str(error))}, 400
-    
+
 
 @jwt_required()
 @is_token_blacklisted
