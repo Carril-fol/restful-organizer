@@ -1,7 +1,7 @@
 from flask import Flask
 
 from asgi import start_server
-from utils.extensions import cache, jwt, swagger
+from utils.extensions import cache, jwt
 
 from controllers.user_controller import auth_blueprint
 from controllers.folder_controller import folder_blueprint
