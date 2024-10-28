@@ -1,10 +1,9 @@
 from flask import Flask
 
 from asgi import start_server
-from utils.extensions import cache, jwt
+from utils.extensions import cache, jwt, swagger
 
 from controllers.user_controller import auth_blueprint
-from controllers.event_controller import event_blueprint
 from controllers.folder_controller import folder_blueprint
 from controllers.task_controller import task_blueprint
 
@@ -23,7 +22,6 @@ cache.init_app(app)
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(folder_blueprint)
 app.register_blueprint(task_blueprint)
-app.register_blueprint(event_blueprint)
 
 if __name__ == "__main__":
     start_server(app)
