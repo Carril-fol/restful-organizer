@@ -1,26 +1,10 @@
 <h1 align="center"> Organizer API REST</h1>
 
-<h4 align="center">A monolithic REST API for managing folders, tasks and events.</h4>
+**Organizer** is an API developed in Flask that provides a platform for organized folder and task management. This API allows users to efficiently structure and manage their tasks, dividing them into folders for better organization and accessibility.
 
-<p align="center">
-  <a href="https://saythanks.io/to/bullredeyes@gmail.com">
-      <img src="https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54" alt="python">
-  </a>
-  <a href="https://badge.fury.io/js/electron-markdownify">
-    <img src="https://img.shields.io/badge/MongoDB-%234ea94b.svg?style=for-the-badge&logo=mongodb&logoColor=white" alt="mongodb">
-  </a>
-  <a href="https://gitter.im/amitmerchant1990/electron-markdownify">
-    <img src="https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white" alt="flask">
-  </a>
-  <a>
-    <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" alt="docker">
-  </a>
-  <a>
-    <img src="https://img.shields.io/badge/Render-%234f0599.svg?style=for-the-badge&logo=render&logoColor=white" alt="render">
-  </a>
-</p>
+The project implements a layered architecture, which facilitates separation of responsibilities and improves code scalability and maintainability.
 
-### Contents
+## Contents
 
 - [Features](#features)
 - [Tech used](#tech-used)
@@ -33,24 +17,29 @@
     - [*Indication*](#indication)
   - [User related](#user-related)
   - [Folders related](#folders-related)
-  - [Events related](#events-related)
   - [Tasks related](#tasks-related)
 
 ## Features
 
-- Register account: Users can register their accounts.
-- Login account: Users can log in their accounts.
-- Log out account: Users can log out from their accounts.
+1. Authentication:
 
-- Create folders: Users can create folders for they management.
-- Update folders: Users can modify they folders.
-- Delete folders: Users can delete folders.
-- Detail folders: Users can view detailed information about a folder.
+  * Register account
+  * Log in
+  * Log out
 
-- Create tasks: Users can create tasks related to a folder to maintain organization.
-- Read tasks: Users can get detail from their tasks.
-- Update tasks: Users can modify their task.
-- Delete tasks: Users can delete their task.
+2. Folder Management:
+
+  * Create folders
+  * Update folders
+  * Delete folders
+  * View folder details
+
+3. Task Management:
+
+  * Create tasks associated with folders
+  * View task details
+  * Update tasks
+  * Delete tasks
 
 ## Tech used 
 
