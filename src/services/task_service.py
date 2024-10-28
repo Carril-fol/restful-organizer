@@ -1,7 +1,7 @@
-from bson import ObjectId
 import json
+from bson import ObjectId
 
-from models.task_model import TaskModel
+from entities.task_model import TaskModel
 from repositories.task_repository import TaskRepository
 from exceptions.task_exception import TaskNotExists
 

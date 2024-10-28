@@ -1,9 +1,12 @@
 import json
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import (
+    generate_password_hash, 
+    check_password_hash
+)
 from pymongo.results import InsertOneResult
 
 from repositories.user_repository import UserRepository
-from models.user_model import UserModelRegister, UserModel
+from entities.user_model import UserModelRegister, UserModel
 from exceptions.user_exceptions import *
 
 class UserService:

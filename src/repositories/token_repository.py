@@ -1,8 +1,7 @@
 from pymongo.results import InsertOneResult
 from database.db import Database
 
-from models.token_model import TokenModel
-
+from entities.token_model import TokenModel
 
 class TokenRepository(object):
     def __init__(self):

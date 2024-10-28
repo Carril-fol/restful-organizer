@@ -1,7 +1,7 @@
 from flask_jwt_extended import get_jwt, get_jti
 
 from repositories.token_repository import TokenRepository
-from models.token_model import TokenModel
+from entities.token_model import TokenModel
 from exceptions.token_exceptions import TokenAlreadyBlacklisted
 
 

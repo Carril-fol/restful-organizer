@@ -2,7 +2,7 @@ import json
 from bson import ObjectId
 
 from repositories.folder_repository import FolderRepository
-from models.folder_model import FolderModel
+from entities.folder_model import FolderModel
 from exceptions.folder_exception import FolderNotFound
 from services.event_service import EventService
 from services.task_service import TaskService

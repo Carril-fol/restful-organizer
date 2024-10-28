@@ -1,7 +1,7 @@
 from bson import ObjectId
 
 from database.db import Database
-from models.folder_model import FolderModel
+from entities.folder_model import FolderModel
 
 class FolderRepository(object):
     def __init__(self):

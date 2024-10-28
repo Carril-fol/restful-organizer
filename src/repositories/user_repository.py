@@ -1,8 +1,11 @@
 from bson import ObjectId
-from pymongo.results import InsertOneResult, UpdateResult
+from pymongo.results import (
+    InsertOneResult, 
+    UpdateResult
+)
 
 from database.db import Database
-from models.user_model import UserModel
+from entities.user_model import UserModel
 
 class UserRepository:
     def __init__(self):

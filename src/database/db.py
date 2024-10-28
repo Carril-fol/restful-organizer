@@ -4,7 +4,7 @@ from pymongo.server_api import ServerApi
 from settings import MONGO_URI
 load_dotenv()
 
-class Database(object):
+class Database:
     def __init__(self):
         """
         Initializes the Database instance.
