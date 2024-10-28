@@ -4,14 +4,12 @@ from bson import ObjectId
 from repositories.folder_repository import FolderRepository
 from entities.folder_model import FolderModel
 from exceptions.folder_exception import FolderNotFound
-from services.event_service import EventService
 from services.task_service import TaskService
 
 class FolderService:
     def __init__(self):
         self.folder_repository = FolderRepository()
         self.task_service = TaskService()
-        self.event_service = EventService()
 
     def _get_user_id_requested(self, user_data: dict):
         user_id = user_data.get("id")
@@ -54,11 +52,9 @@ class FolderService:
             raise FolderNotFound()
         folder_json = self._folder_in_format_json(folder_instance)
         tasks_json = await self.task_service.get_all_task_by_folder_id(folder_id)
-        events_json = await self.event_service.get_all_event_by_folder_id(folder_id)
         data_folder = {
             "folder": folder_json,
-            "tasks": tasks_json,
-            "events": events_json
+            "tasks": tasks_json
         }
         return data_folder
     
@@ -81,7 +77,6 @@ class FolderService:
         folder = self.check_if_folder_exists_by_id(folder_id)
         if not folder:
             raise FolderNotFound()
-        tasks_deleted = await self.event_service.delete_events(folder_id)
         events_deleted = await self.task_service.delete_tasks(folder_id)
         folder_deleted = await self.folder_repository.delete_folder(folder_id)
         return folder_deleted
