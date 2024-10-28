@@ -9,7 +9,3 @@ cache = Cache()
 # Flask-JWT-Extended
 # https://flask-jwt-extended.readthedocs.io/en/stable/
 jwt = JWTManager()
-
-# Flask-Restful
-# https://flask-restful.readthedocs.io/en/latest/index.html
-api = Api()
