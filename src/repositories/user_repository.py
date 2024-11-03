@@ -39,7 +39,7 @@ class UserRepository:
         user_created = self.user_collection.insert_one(user_data_dict)
         return user_created
 
-    async def get_user_by_id(self, user_id: str) -> dict:
+    async def get_user_by_id(self, user_id: ObjectId) -> dict:
         """
         Returns a instance from the user
 
@@ -49,7 +49,7 @@ class UserRepository:
         Returns:
         UserModel: User model instance
         """
-        user_dict_id = {"_id": ObjectId(user_id)}
+        user_dict_id = {"_id": user_id}
         user_data = self.user_collection.find_one(user_dict_id)
         return user_data
     
@@ -67,7 +67,7 @@ class UserRepository:
         user_data = self.user_collection.find_one(user_dict_email)
         return user_data
 
-    def update_user(self, user_id: str, user_model_instance: UserModel) -> UpdateResult:
+    def update_user(self, user_id: ObjectId, user_model_instance: UserModel) -> UpdateResult:
         """  
         Replaces new information in a record where it matches the ID entered.
 
@@ -80,7 +80,7 @@ class UserRepository:
         -------
         UpdateResult: a instance from the user with the data updated
         """
-        user_dict_id = {"_id": ObjectId(user_id)}
+        user_dict_id = {"_id": user_id}
         user_new_data_dict = user_model_instance.model_dump(by_alias=True)
-        user_update = self.user_collection.update_one(user_dict_id, user_model_instance)
+        user_update = self.user_collection.update_one(user_dict_id, user_new_data_dict)
         return user_update
