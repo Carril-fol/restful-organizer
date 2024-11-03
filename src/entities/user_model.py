@@ -1,4 +1,4 @@
-import re
+import re   
 from typing import Optional
 from bson import ObjectId
 from pydantic import BaseModel, EmailStr, Field, field_validator
@@ -11,7 +11,7 @@ class UserModel(BaseModel):
     last_name: str
     email: EmailStr
     password: str
-    is_verfied: bool = False
+    is_verified: bool = False
     is_authenticated: bool = False
     is_admin: bool = False
     is_superuser: bool = False
@@ -19,13 +19,13 @@ class UserModel(BaseModel):
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
-
+        
 
 class UserModelRegister(UserModel):
     confirm_password: str
 
     @field_validator("password", "confirm_password")
-    def validation_password(cls, values):
+    def validate_password_special_character(cls, values):
         """
         This validation allows you to check if the password 
         contains special characters
