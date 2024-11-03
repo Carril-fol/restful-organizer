@@ -1,13 +1,18 @@
 import json
+from bson import ObjectId
+from pymongo.results import InsertOneResult
 from werkzeug.security import (
     generate_password_hash, 
     check_password_hash
 )
-from pymongo.results import InsertOneResult
 
 from repositories.user_repository import UserRepository
 from entities.user_model import UserModelRegister, UserModel
-from exceptions.user_exceptions import *
+from exceptions.user_exceptions import (
+    UserNotFoundException,
+    UserAlreadyExists,
+    PasswordDontMatch
+)
 
 class UserService:
     def __init__(self):
@@ -20,9 +25,30 @@ class UserService:
         """
         self.user_repository = UserRepository()
 
-    def get_user_id_requeted(self, user_data_from_token: dict):
-        user_id = user_data_from_token.get("id")
+    def get_user_id_requeted(self, user_identity_dict: dict):
+        user_id = user_identity_dict.get("id")
         return user_id
+    
+    def _model_dump_json(self, user_data_dict: dict, exclude_password: bool):
+        """
+        Serializes the UserModel into JSON format, with an option to exclude the password.
+
+        Args:
+        ----
+        user_data_dict (dict): The user data to serialize.
+        exclude_password (bool, optional): Whether to exclude the password field. Defaults to True.
+
+        Returns:
+        -------
+        str: JSON string of the user data.
+        """
+        user_model = UserModel.model_validate(user_data_dict)
+        if exclude_password:
+            return user_model.model_dump_json(exclude={"password"})
+        return user_model.model_dump_json()
+    
+    def _format_model_in_json(self, user_data):
+        return json.loads(user_data)
         
     async def _hash_password(self, password: str) -> str:
         """
@@ -49,8 +75,20 @@ class UserService:
         -------
         bool: True if the password matches, False otherwise.
         """
-        return check_password_hash(password_hashed, password)
-
+        passwords_equals = check_password_hash(password_hashed, password)
+        if not passwords_equals:
+            raise PasswordDontMatch
+        return passwords_equals
+    
+    async def _process_passwords(self, password: str, confirm_password: str) -> str:
+        """
+        Hashes the password if it matches the confirmation, raises error otherwise.
+        """
+        if password != confirm_password:
+            raise PasswordDontMatch()
+        password_hash = await self._hash_password(password)
+        return password_hash
+    
     async def _check_user_exists_by_id(self, user_id: str):
         """
         Check if there is any record with this user id.
@@ -63,7 +101,8 @@ class UserService:
         -------
         dict: A dict with the all information from the user if exists, False otherwise.
         """
-        user_instance = await self.user_repository.get_user_by_id(user_id)
+        user_id_formated = ObjectId(user_id)
+        user_instance = await self.user_repository.get_user_by_id(user_id_formated)
         return user_instance if user_instance else False
     
     async def _check_user_exists_by_email(self, email: str):
@@ -78,8 +117,8 @@ class UserService:
         """
         user_instance = await self.user_repository.get_user_by_email(email)
         return user_instance if user_instance else False
-
-    async def get_user_by_id(self, user_identity: dict) -> UserModel:
+    
+    async def get_user_by_id(self, user_id: str) -> UserModel:
         """
         Retrieves a user by their ID and returns a UserModel instance with their details.
         
@@ -89,13 +128,12 @@ class UserService:
         Returns:
         UserModel: Instance with the user's details, or None if the user is not found.
         """
-        user_id = user_identity.get("id")
-        user_exists = await self._check_user_exists_by_id(user_id)
-        if not user_exists:
+        user = await self._check_user_exists_by_id(user_id)
+        if not user:
             raise UserNotFoundException()
         
-        user_model_dump_json = UserModel.model_validate(user_exists).model_dump_json()
-        user_format_json = json.loads(user_model_dump_json)
+        user_model_dump_json = self._model_dump_json(user, True)
+        user_format_json = self._format_model_in_json(user_model_dump_json)
         return user_format_json
 
     async def get_user_by_email(self, user_email: str) -> UserModel:
@@ -108,12 +146,12 @@ class UserService:
         Returns:
         UserModel: Instance with the user's details, or None if the user is not found.
         """
-        user_exists = await self._check_user_exists_by_email(user_email)
-        if not user_exists:
-            raise UserNotFoundException()
+        user = await self._check_user_exists_by_email(user_email)
+        if user:
+            raise UserAlreadyExists()
         
-        user_model_dump_json = UserModel.model_validate(user_exists).model_dump_json()
-        user_format_json = json.loads(user_model_dump_json)
+        user_model_dump_json = self._model_dump_json(user, True)
+        user_format_json = self._format_model_in_json(user_model_dump_json)
         return user_format_json
 
     async def create_user(self, data: dict) -> InsertOneResult:
@@ -131,26 +169,16 @@ class UserService:
         users_exists = await self._check_user_exists_by_email(data["email"])
         if users_exists:
             raise UserAlreadyExists()
+        
+        user_model_register = UserModelRegister.model_validate(data)
 
-        user_instance_model_register = UserModelRegister(
-            first_name=data["first_name"], 
-            last_name=data["last_name"], 
-            email=data["email"], 
-            password=data["password"],
-            confirm_password=data["confirm_password"]
-        )
+        password_hashed = await self._process_passwords(data["password"], data["confirm_password"])
 
-        password_hashed = await self._hash_password(user_instance_model_register.password)
-        passwords_check_hashed = await self._verify_password(password_hashed, data["confirm_password"])
-        if not passwords_check_hashed:
-            raise PasswordDontMatch()
+        user_model_register_dict = user_model_register.model_dump()
+        user_model_register_dict.pop("confirm_password")
+        user_model_register_dict["password"] = password_hashed
 
-        user_instance_model = UserModel(
-            first_name=user_instance_model_register.first_name, 
-            last_name=user_instance_model_register.last_name, 
-            email=user_instance_model_register.email, 
-            password=password_hashed,
-        )
+        user_instance_model = UserModel.model_validate(user_model_register_dict)
         user_created = self.user_repository.create_user(user_instance_model)
         return user_created.inserted_id
 
@@ -167,15 +195,12 @@ class UserService:
         -------
         UserModel: The authenticated user instance if credentials are valid, None otherwise.
         """
-        user_exists = await self._check_user_exists_by_email(data["email"])
-        if not user_exists:
+        user = await self._check_user_exists_by_email(data["email"])
+        if not user:
             raise UserNotFoundException()
-        
-        password_user_stored = user_exists["password"]
-        verification_password = await self._verify_password(password_user_stored, data["password"])
-        if not verification_password:
-            raise PasswordDontMatch()
-        
-        user_model_dump_json = UserModel.model_validate(user_exists).model_dump_json()
-        user_format_json = json.loads(user_model_dump_json)
+
+        await self._verify_password(user["password"], data["password"])
+
+        user_model_dump_json = self._model_dump_json(user, True)
+        user_format_json = self._format_model_in_json(user_model_dump_json)
         return user_format_json
