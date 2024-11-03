@@ -64,13 +64,12 @@ async def register():
     if not data:
         return {"error": "Missing JSON in request"}, 400
     try:
-        new_user = await user_service.create_user(data)
-        user_json = await user_service.get_user_by_id(new_user)
-        access_token = create_access_token(user_json)
+        user_created_id = await user_service.create_user(data)
+        get_user_json = await user_service.get_user_by_id(user_created_id)
+        access_token = create_access_token(get_user_json)
         return {
             "msg": "User created",
-            "user": user_json,
-            "access_token": access_token,
+            "access_token": access_token
         }, 201
     except Exception as error:
         return {"error": (str(error))}, 400
@@ -119,9 +118,9 @@ async def login():
         return {"error": (str(error))}, 400
 
 
+@auth_blueprint.route("/detail", methods=["GET"])
 @jwt_required()
 @is_token_blacklisted
-@auth_blueprint.route("/detail", methods=["GET"])
 async def detail_user_requested():
     """
     Example:
@@ -150,9 +149,10 @@ async def detail_user_requested():
     }
     ```
     """
-    user_identity = get_jwt_identity()
+    user_identity_dict = get_jwt_identity()
+    user_id = user_service.get_user_id_requeted(user_identity_dict)
     try:
-        user_exists = await user_service.get_user_by_id(user_identity)
+        user_exists = await user_service.get_user_by_id(user_id)
         return {"user": user_exists}, 200
     except UserNotFoundException as error:
         return {"error": (str(error))}, 404
@@ -160,8 +160,8 @@ async def detail_user_requested():
         return {"error": (str(error))}, 400
 
 
-@jwt_required(optional=False)
 @auth_blueprint.route("/logout", methods=["POST"])
+@jwt_required(optional=False)
 async def logout():
     """
     Example:
@@ -186,14 +186,14 @@ async def logout():
     """
     try:
         token = get_jwt()
-        blacklist_token = await token_service.blacklist_token(token)
+        await token_service.blacklist_token(token)
         return {"msg": "Logout succesfully"}, 200
     except Exception as error:
         return {"error": (str(error))}, 400
 
 
-@jwt_required(verify_type=True, refresh=True)
 @auth_blueprint.route("/refresh", methods=["POST"])
+@jwt_required(verify_type=True, refresh=True)
 def refresh_token():
     """
     Example:
