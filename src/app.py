@@ -24,4 +24,5 @@ app.register_blueprint(folder_blueprint)
 app.register_blueprint(task_blueprint)
 
 if __name__ == "__main__":
-    start_server(app)
+    #start_server(app)
+    app.run("localhost", 8000, True)
