@@ -1,7 +1,7 @@
 from flask import Flask
 
 from asgi import start_server
-from utils.extensions import cache, jwt
+from utils.extensions import cache, jwt, cors
 
 from controllers.user_controller import auth_blueprint
 from controllers.folder_controller import folder_blueprint
@@ -17,6 +17,9 @@ jwt.init_app(app)
 
 # Flask-Caching
 cache.init_app(app)
+
+# Flask CORS
+cors.init_app(app, supports_credentials=True, origins=["http://localhost:5173"])
 
 # Endpoints
 app.register_blueprint(auth_blueprint)
