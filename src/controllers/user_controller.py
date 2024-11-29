@@ -1,13 +1,17 @@
-# Imports
-from flask import Blueprint, request
+from flask import (
+    Blueprint, 
+    request, 
+    jsonify, 
+    make_response
+)
 from flask_jwt_extended import (
     create_access_token,
-    create_refresh_token,
     jwt_required,
     get_jwt_identity,
     get_jwt,
+    unset_access_cookies,
+    set_access_cookies
 )
-
 from services.user_service import UserService
 from services.token_service import TokenService
 from exceptions.user_exceptions import UserNotFoundException
@@ -67,10 +71,9 @@ async def register():
         user_created_id = await user_service.create_user(data)
         get_user_json = await user_service.get_user_by_id(user_created_id)
         access_token = create_access_token(get_user_json)
-        return {
-            "msg": "User created",
-            "access_token": access_token
-        }, 201
+        response = make_response({"msg": "Register successful"}, 200)
+        set_access_cookies(response, access_token)
+        return response
     except Exception as error:
         return {"error": (str(error))}, 400
 
@@ -80,7 +83,7 @@ async def login():
     """
     Example:
 
-    POST: /users/login
+    POST: /users/api/v1/login
 
     ```
     Application data:
@@ -93,7 +96,6 @@ async def login():
     {
         "message": "Login successful"
         "access_token": "8uP9dv0czfTLY8WEma1fZyBYLzUed.sXiwp31A4wQ6klpJclPYQyZDsFruLuybCsd..."
-        "refresh_token": "8uP9dv0czfTLY8WEma1fZyBYLzUed.sXiwp31A4wQ6klpJclPYQyZDsFruLuybCd9..."
     }
 
     Response with errors (code 400 - BAD REQUEST):
@@ -108,10 +110,10 @@ async def login():
         return {"error": "Missing JSON in request"}, 400
     try:
         user_exists = await user_service.authenticate_user(data)
-        refresh_token = create_refresh_token(user_exists)
         access_token = create_access_token(user_exists)
-        tokens = {"access_token": access_token, "refresh_token": refresh_token}
-        return {"msg": "Login succefully", "tokens": tokens}, 200
+        response = make_response({"msg": "Login successful"}, 200)
+        set_access_cookies(response, access_token)
+        return response
     except UserNotFoundException as error:
         return {"error": (str(error))}, 404
     except Exception as error:
@@ -125,7 +127,7 @@ async def detail_user_requested():
     """
     Example:
 
-    GET: /users/<user_id>
+    GET: /users/api/v1/<user_id>
     ```
     Header Authorization:
     {
@@ -161,12 +163,12 @@ async def detail_user_requested():
 
 
 @auth_blueprint.route("/logout", methods=["POST"])
-@jwt_required(optional=False)
+@jwt_required()
 async def logout():
     """
     Example:
 
-    GET: /users/logout
+    GET: /users/api/v1/logout
     ```
     Header Authorization:
     {
@@ -187,7 +189,9 @@ async def logout():
     try:
         token = get_jwt()
         await token_service.blacklist_token(token)
-        return {"msg": "Logout succesfully"}, 200
+        response = make_response(jsonify({"msg": "Logout succesfully"}), 200)
+        unset_access_cookies(response)
+        return response
     except Exception as error:
         return {"error": (str(error))}, 400
 
