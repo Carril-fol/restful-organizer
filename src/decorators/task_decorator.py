@@ -2,10 +2,12 @@ from flask_jwt_extended import get_jwt_identity
 from functools import wraps
 
 from services.task_service import TaskService
-from exceptions.task_exception import TaskNotExists
 from services.folder_service import FolderService
+from services.user_service import UserService
+from exceptions.task_exception import TaskNotExists
 from exceptions.folder_exception import FolderNotFound
 
+user_service = UserService()
 task_service = TaskService()
 folder_service = FolderService()
 
@@ -29,17 +31,22 @@ def is_task_from_the_user(fn):
         in the token is equals to the user id in the folder.
     """ 
     @wraps(fn)
-    def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs):
         try:
-            user_id = get_jwt_identity()["id"]
+            user_data_token = get_jwt_identity()
+            user_id = user_service.get_user_id_requeted(user_data_token)
+
             task_id = kwargs.get("task_id")
-            task_exists = task_service.detail_task(task_id)
-            folder_id = task_exists["folder_id"]
-            folder_exists = folder_service.detail_folder(folder_id)
-            folder_creator = folder_exists.get("folder")["user_id"]
+            task_detail = await task_service.detail_task(task_id)
+
+            folder_id = task_detail["folder_id"]
+            folder_detail = await folder_service.detail_folder(folder_id)
+            folder_creator = folder_detail.get("folder", {}).get("user_id")
+            
             if folder_creator != user_id:
                 return {"error": "Unauthorized access to this task"}, 403
-            return fn(*args, **kwargs)
+            return await fn(*args, **kwargs)
+        
         except FolderNotFound as error:
             return {"error": (str(error))}, 404
         except TaskNotExists as error:
