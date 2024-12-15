@@ -198,9 +198,7 @@ class UserService:
         user = await self._check_user_exists_by_email(data["email"])
         if not user:
             raise UserNotFoundException()
-
         await self._verify_password(user["password"], data["password"])
-
         user_model_dump_json = self._model_dump_json(user, True)
         user_format_json = self._format_model_in_json(user_model_dump_json)
         return user_format_json

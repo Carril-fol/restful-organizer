@@ -15,7 +15,7 @@ class TaskService:
         """
         self.task_repository = TaskRepository()
 
-    def __check_if_task_exists_by_id(self, task_id: str):
+    def _check_if_task_exists_by_id(self, task_id: str):
         """
         Allows returning a dictionary with the information of the task entered by id..
 
@@ -30,6 +30,22 @@ class TaskService:
         task_exists = self.task_repository.get_task_by_id(task_id)
         return task_exists if task_exists else False
     
+    def _format_dict_in_model(self, folder_id: str, data_task: dict) -> TaskModel:
+        """
+        Formats the input data and creates an instance of the TaskModel.
+
+        Attributes:
+        ----------
+        folder_id (str): A text string representing the ID of a folder.
+        data_task (dict): A dictionary containing task information.
+
+        Returns:
+        -------
+        TaskModel: An instance of the task model.
+        """
+        data_task["folder_id"] = ObjectId(folder_id)
+        return TaskModel.model_validate(data_task)
+
     async def get_all_task_by_folder_id(self, folder_id: str):
         """
         Allows to see all tasks related for a folder_id.
@@ -43,14 +59,13 @@ class TaskService:
         A list of dictionaries with the task information.
         """
         tasks_from_database = await self.task_repository.get_tasks_by_folder_id(folder_id)
-        tasks_formated = [
+        return [
             json.loads(
                 TaskModel.model_validate(task).model_dump_json(by_alias=True)
             ) for task in tasks_from_database
         ]
-        return tasks_formated
 
-    def detail_task(self, task_id: str):
+    async def detail_task(self, task_id: str):
         """
         Allows to see the information of the task by their id.
 
@@ -66,14 +81,13 @@ class TaskService:
         -------
         A dictionaries with the task information.
         """
-        task_exists = self.__check_if_task_exists_by_id(task_id)
+        task_exists = self._check_if_task_exists_by_id(task_id)
         if not task_exists:
             raise TaskNotExists()
         task_model_dump_json = TaskModel.model_validate(task_exists).model_dump_json()
-        task_format_json = json.loads(task_model_dump_json)
-        return task_format_json
+        return json.loads(task_model_dump_json)
 
-    def create_task(self, folder_id: str, data: dict):
+    async def create_task(self, folder_id: str, data: dict):
         """
         Allows to create tasks.
 
@@ -86,17 +100,10 @@ class TaskService:
         -------
         A dictionary with the information from the task created.
         """
-        task_instance_model = TaskModel(
-            name=data["name"],
-            body=data["body"],
-            status=data["status"],
-            folder_id=ObjectId(folder_id)
-        )
-        task_created = self.task_repository.create_task(task_instance_model)
-        task_format_json = self.detail_task(task_created)
-        return task_format_json
+        task_instance_model = self._format_dict_in_model(folder_id, data)
+        return await self.task_repository.create_task(task_instance_model)
     
-    def delete_task(self, task_id: str):
+    async def delete_task(self, task_id: str):
         """
         Allows to delete tasks.
 
@@ -112,13 +119,11 @@ class TaskService:
         -------
         An instance of "DeleteResult" from PyMongo.
         """
-        task_exists = self.__check_if_task_exists_by_id(task_id)
-        if not task_exists:
+        if not self._check_if_task_exists_by_id(task_id):
             raise TaskNotExists()
-        task_delete = self.task_repository.delete_task(task_id)
-        return task_delete
+        return await self.task_repository.delete_task(task_id)
     
-    def update_task(self, task_id: str, data: dict):
+    async def update_task(self, task_id: str, data: dict):
         """
         Allows to update tasks.
 
@@ -135,13 +140,9 @@ class TaskService:
         -------
         A upserted ID from the task.
         """
-        task_exists = self.__check_if_task_exists_by_id(task_id)
-        if not task_exists:
+        if not self._check_if_task_exists_by_id(task_id):
             raise TaskNotExists()
-        if data.get("folder_id"):
-            data["folder_id"] = ObjectId(data["folder_id"])
-        task_update = self.task_repository.update_task(task_id, data)
-        return task_update
+        return await self.task_repository.update_task(task_id, data)
     
     async def delete_tasks(self, folder_id: str):
         """
@@ -155,5 +156,4 @@ class TaskService:
         -------
         A instance from "DeleteResult".
         """
-        tasks_deleted = await self.task_repository.delete_tasks_by_folder_id(folder_id)
-        return tasks_deleted 
+        return await self.task_repository.delete_tasks_by_folder_id(folder_id) 
