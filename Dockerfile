@@ -1,12 +1,15 @@
-FROM python:3-alpine
+FROM python:3.10-alpine
 
-RUN apk add --no-cache python3-dev \
-  && pip3 install --upgrade pip
+RUN apk add --no-cache gcc musl-dev libffi-dev openssl-dev python3-dev
 
-WORKDIR /restful-organizer
+RUN pip3 install --upgrade pip
 
-COPY . /restful-organizer
+WORKDIR /backend
 
-RUN pip3 --no-cache-dir install -r requirements.txt
+COPY . /backend
+
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+EXPOSE 8000
 
 CMD ["python", "src/app.py"]
