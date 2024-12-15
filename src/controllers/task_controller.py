@@ -1,10 +1,7 @@
-# Imports
-from flask import request, Blueprint
+from flask import request, Blueprint, make_response
 from flask_jwt_extended import jwt_required
 
-from utils.extensions import cache
 from services.task_service import TaskService
-from decorators.user_decorator import is_token_blacklisted
 from decorators.folder_decorator import is_folder_from_the_user
 from decorators.task_decorator import is_task_from_the_user
 
@@ -14,11 +11,10 @@ task_blueprint = Blueprint("task", __name__, url_prefix="/tasks/api/v1")
 # Services
 task_service = TaskService()
 
-@jwt_required(locations=["headers"])
-@is_token_blacklisted
+@task_blueprint.route("/create/<folder_id>", methods=["POST"])
+@jwt_required()
 @is_folder_from_the_user
-@task_blueprint.route("/create", methods=["POST"])
-def create_task(self, folder_id: str):
+async def create_task(folder_id: str):
     """
     Example:
 
@@ -33,13 +29,7 @@ def create_task(self, folder_id: str):
         
     Successful response (Code 201 - CREATED):
     {
-        "status": "Created",
-        "task": {
-            "name": "Name of the task",
-            "body":  "Body of the task",
-            "status": "Status of the task",
-            "folder_id": "Id from the folder"
-        }
+        "status": "Created"
     }
 
     Response with errors (Code 400 - BAD REQUEST):
@@ -50,48 +40,19 @@ def create_task(self, folder_id: str):
     """
     data = request.get_json()
     if not data:
-        return {"error": "Missing JSON in request"}, 400
+        return make_response({"error": "Missing JSON in request"}, 400)
     if not folder_id:
-        return {"error": "Missing ID from the folder in the URL."}, 400
-    task_created = task_service.create_task(folder_id, data)
-    return {"status": "Created", "task": task_created}, 201
-        
+        return make_response({"error": "Missing ID from the folder in the URL."}, 400)
+    try:
+        await task_service.create_task(folder_id, data)
+        return make_response({"status": "Created"}, 201)
+    except Exception as error:
+        return make_response({"error": error}, 400)
 
-@jwt_required()
-@is_token_blacklisted
-@is_task_from_the_user
-@cache.cached(timeout=300)
-@task_blueprint.route("/detail/<task_id>", methods=["GET"])
-def detail_task(task_id: str):
-    """
-    Example:
-
-    GET: /tasks/api/v1/<task_id>
-    ```
-    Successful response (Code 200 - OK):
-    {
-        "task": {
-            "name": "Name of the task",
-            "body":  "Body of the task",
-            "status": "Status of the task",
-            "folder_id": "Id from the folder"
-        }
-    }
-
-    Response with errors (Code 400 - BAD REQUEST):
-    {
-        "error": "Task not exists."
-    }
-    ```
-    """
-    task_detail = task_service.detail_task(task_id)
-    return {"task": task_detail}, 200
-    
-        
-@is_token_blacklisted
-@is_task_from_the_user
 @task_blueprint.route("/delete/<task_id>", methods=["DELETE"])
-def delete_task(task_id: str):
+@jwt_required()
+@is_task_from_the_user
+async def delete_task(task_id: str):
     """
     Example:
 
@@ -108,15 +69,16 @@ def delete_task(task_id: str):
     }
     ```
     """
-    task_deleted = task_service.delete_task(task_id)
-    return {"status": "Deleted"}, 200
+    try:
+        await task_service.delete_task(task_id)
+        return make_response({"status": "Deleted"}, 200)
+    except Exception as error:
+        return make_response({"error": error}, 400)
 
-
-@is_token_blacklisted
-@is_task_from_the_user
-@jwt_required()
 @task_blueprint.route("/update/<task_id>", methods=["PUT", "PATCH"])
-def update_task(task_id: str):
+@jwt_required()
+@is_task_from_the_user
+async def update_task(task_id: str):
     """
         Example:
 
@@ -143,6 +105,14 @@ def update_task(task_id: str):
     """
     data = request.get_json()
     if not data:
-        return {"error": "Missing JSON in the request"}, 200
-    task_update = task_service.update_task(task_id, data)
-    return {"status": "Updated"}, 200
+        return make_response({"error": "Missing JSON in the request"}, 200)
+    await task_service.update_task(task_id, data)
+    return make_response({"status": "Updated"}, 200)
+
+@task_blueprint.route("/get/<folder_id>", methods=["GET"])
+@jwt_required()
+async def get_all_tasks_from_folder(folder_id: str):
+    if not folder_id:
+        return make_response({"error": "Missing Folder ID in the URL"}, 400)
+    tasks = await task_service.get_all_task_by_folder_id(folder_id)
+    return make_response({"tasks": tasks}, 200)

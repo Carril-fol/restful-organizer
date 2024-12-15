@@ -1,23 +1,17 @@
-# Imports
-from flask import request, Blueprint
+from flask import request, Blueprint, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from utils.extensions import cache
 from services.folder_service import FolderService
 from exceptions.folder_exception import FolderNotFound
-from decorators.user_decorator import is_token_blacklisted
 from decorators.folder_decorator import is_folder_from_the_user
 
-# Blueprint
 folder_blueprint = Blueprint("folder", __name__, url_prefix="/folders/api/v1")
 
-# Service
 folder_service = FolderService()
 
 @folder_blueprint.route("/create", methods=["POST"])
 @jwt_required()
-@is_token_blacklisted
-def create_folder():
+async def create_folder():
     """
     Example:
 
@@ -44,22 +38,20 @@ def create_folder():
     }
     ```
     """
-    user_data_in_token = get_jwt_identity()
+    token = get_jwt_identity()
     data = request.get_json()
     if not data:
-        return {"error", "Missing JSON in the request"}, 400
-    response = folder_service.create_folder(data, user_data_in_token)
-    return {"status": "Created"}, 201
+        return make_response({"error", "Missing JSON in the request"}, 400)
+    await folder_service.create_folder(data, token)
+    return make_response({"status": "Created"}, 201)
 
 @folder_blueprint.route("/", methods=["GET"])
 @jwt_required()
-@is_token_blacklisted
-@cache.cached(timeout=60)
 async def get_folders_from_user():
     """
     Example:
 
-    GET: /folders/api/v1/<user_id>
+    GET: /folders/api/v1/
     ```
     Successful response (Code 200 - OK):
     {
@@ -74,13 +66,12 @@ async def get_folders_from_user():
     }
     ```
     """
-    user_data_from_token = get_jwt_identity()
-    response = await folder_service.get_folders_from_user(user_data_from_token)
-    return {"folders": response}, 200
+    token = get_jwt_identity()
+    folders = await folder_service.get_folders_from_user(token)
+    return make_response({"folders": folders}, 200)
 
 @folder_blueprint.route("/detail/<folder_id>", methods=["GET"])
 @jwt_required()
-@is_token_blacklisted
 @is_folder_from_the_user
 async def detail_folder(folder_id: str):
     """
@@ -126,15 +117,14 @@ async def detail_folder(folder_id: str):
     """
     try:
         response = await folder_service.detail_folder(folder_id)
-        return {"data": response}, 200
+        return make_response({"data": response}, 200)
     except FolderNotFound as error:
-        return {"error": str(error)}, 404
+        return make_response({"error": str(error)}, 404)
     except Exception as error:
-        return {"error": str(error)}, 400
+        return make_response({"error": str(error)}, 400)
 
 @folder_blueprint.route("/update/<folder_id>", methods=["PUT", "PATCH"])
 @jwt_required()
-@is_token_blacklisted
 @is_folder_from_the_user
 async def update_folder(folder_id: str):
     """
@@ -163,17 +153,18 @@ async def update_folder(folder_id: str):
     }
     ```
     """
-    user_data_in_token = get_jwt_identity()
-    print(user_data_in_token)
-    data = request.get_json()
-    if not data:
-        return {"error": "Missing JSON in the request"}
-    response = await folder_service.update_folder(user_data_in_token, folder_id, data)
-    return {"status": "Updated"}, 200
+    try:
+        token = get_jwt_identity()
+        data = request.get_json()
+        if not data:
+            return make_response({"error": "Missing JSON in the request"}, 400)
+        await folder_service.update_folder(token, folder_id, data)
+        return make_response({"status": "Updated"}, 200)
+    except Exception as error:
+        return make_response({"error": error}, 400)
 
 @folder_blueprint.route("/delete/<folder_id>", methods=["DELETE"])
 @jwt_required()
-@is_token_blacklisted
 @is_folder_from_the_user
 async def delete_folder(folder_id: str):
     """
@@ -192,5 +183,5 @@ async def delete_folder(folder_id: str):
     }
     ```
     """
-    response = await folder_service.delete_folder(folder_id)
-    return {"status": "Deleted"}, 200
+    await folder_service.delete_folder(folder_id)
+    return make_response({"status": "Deleted"}, 200)
