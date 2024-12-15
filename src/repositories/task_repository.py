@@ -32,7 +32,7 @@ class TaskRepository:
         task_found = self.task_collection.find_one(task_data_filter)
         return task_found
 
-    def create_task(self, task_instance_model: TaskModel):
+    async def create_task(self, task_instance_model: TaskModel):
         """
         Formats the input model instance to a dictionary and inserts it into the corresponding collection of tasks.
 
@@ -45,10 +45,9 @@ class TaskRepository:
         The id inserted in the data collection.
         """
         task_model_dump = task_instance_model.model_dump(by_alias=True)
-        task_created = self.task_collection.insert_one(task_model_dump)
-        return task_created.inserted_id
+        return self.task_collection.insert_one(task_model_dump)
     
-    def delete_task(self, task_id: str):
+    async def delete_task(self, task_id: str):
         """
         Allows to delete a task based on they ID.
         
@@ -61,10 +60,9 @@ class TaskRepository:
         An instance of "DeleteResult" from PyMongo.
         """
         task_data_filter = {"_id": ObjectId(task_id)}
-        task_delete = self.task_collection.delete_one(task_data_filter)
-        return task_delete
+        return self.task_collection.delete_one(task_data_filter)
     
-    def update_task(self, task_id: str, new_data_task: dict):
+    async def update_task(self, task_id: str, new_data_task: dict):
         """
         Allows you to update an existing task.
         
@@ -78,11 +76,8 @@ class TaskRepository:
         The ID upserted in the data collection.
         """
         task_data_filter = {"_id": ObjectId(task_id)}
-        task_new_data = {
-            "$set": new_data_task
-        }
-        task_updated = self.task_collection.update_one(task_data_filter, task_new_data)
-        return task_updated.upserted_id
+        task_new_data = {"$set": new_data_task}
+        return self.task_collection.update_one(task_data_filter, task_new_data)
 
     async def get_tasks_by_folder_id(self, folder_id: str):
         """
@@ -97,8 +92,7 @@ class TaskRepository:
         returns dictionaries of the tasks that contain the folder_id.
         """
         task_data_filter = {"folder_id": ObjectId(folder_id)}
-        tasks_founds = self.task_collection.find(task_data_filter)
-        return tasks_founds
+        return self.task_collection.find(task_data_filter)
     
     async def delete_tasks_by_folder_id(self, folder_id: str):
         """
@@ -113,5 +107,4 @@ class TaskRepository:
         returns a instance "DeleteResult" from PyMongo 
         """
         task_data_filter = {"folder_id": ObjectId(folder_id)}
-        tasks_deleted = self.task_collection.delete_many(task_data_filter)
-        return tasks_deleted
+        return self.task_collection.delete_many(task_data_filter)
