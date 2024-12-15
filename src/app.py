@@ -1,7 +1,11 @@
 from flask import Flask
 
 from asgi import start_server
+<<<<<<< HEAD
 from utils.extensions import jwt, cors
+=======
+from utils.extensions import cache, jwt, cors
+>>>>>>> 2d9e69f7b091b216dfb092e9f16c0d54da666969
 
 from controllers.user_controller import auth_blueprint
 from controllers.folder_controller import folder_blueprint
@@ -17,6 +21,9 @@ jwt.init_app(app)
 
 # Flask CORS
 cors.init_app(app, supports_credentials=True, origins="*")
+
+# Flask CORS
+cors.init_app(app, supports_credentials=True, origins=["http://localhost:5173"])
 
 # Endpoints
 app.register_blueprint(auth_blueprint)
