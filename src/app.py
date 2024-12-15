@@ -1,11 +1,7 @@
 from flask import Flask
 
 from asgi import start_server
-<<<<<<< HEAD
 from utils.extensions import jwt, cors
-=======
-from utils.extensions import cache, jwt, cors
->>>>>>> 2d9e69f7b091b216dfb092e9f16c0d54da666969
 
 from controllers.user_controller import auth_blueprint
 from controllers.folder_controller import folder_blueprint
