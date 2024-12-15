@@ -6,18 +6,13 @@ from flask import (
 )
 from flask_jwt_extended import (
     create_access_token,
+    create_refresh_token,
     jwt_required,
     get_jwt_identity,
-<<<<<<< HEAD
     unset_access_cookies,
     set_access_cookies,
     set_refresh_cookies,
     unset_jwt_cookies
-=======
-    get_jwt,
-    unset_access_cookies,
-    set_access_cookies
->>>>>>> 2d9e69f7b091b216dfb092e9f16c0d54da666969
 )
 from services.user_service import UserService
 from exceptions.user_exceptions import UserNotFoundException
@@ -61,19 +56,12 @@ async def register():
         return {"error": "Missing JSON in request"}, 400
     try:
         user_created_id = await user_service.create_user(data)
-<<<<<<< HEAD
         user_data = await user_service.get_user_by_id(user_created_id)
         access_token = create_access_token(user_data)
         refresh_token = create_refresh_token(user_data)
         response = make_response({"msg": "Register successful"}, 200)
         set_access_cookies(response, access_token)
         set_refresh_cookies(response, refresh_token)
-=======
-        get_user_json = await user_service.get_user_by_id(user_created_id)
-        access_token = create_access_token(get_user_json)
-        response = make_response({"msg": "Register successful"}, 200)
-        set_access_cookies(response, access_token)
->>>>>>> 2d9e69f7b091b216dfb092e9f16c0d54da666969
         return response
     except Exception as error:
         return {"error": (str(error))}, 400
@@ -112,15 +100,8 @@ async def login():
     try:
         user_exists = await user_service.authenticate_user(data)
         access_token = create_access_token(user_exists)
-<<<<<<< HEAD
-        refresh_token = create_refresh_token(user_exists)
         response = make_response({"msg": "Login successful"}, 200)
         set_access_cookies(response, access_token)
-        set_refresh_cookies(response, refresh_token)
-=======
-        response = make_response({"msg": "Login successful"}, 200)
-        set_access_cookies(response, access_token)
->>>>>>> 2d9e69f7b091b216dfb092e9f16c0d54da666969
         return response
     except UserNotFoundException as error:
         return {"error": (str(error))}, 404
@@ -194,16 +175,9 @@ async def logout():
     ```
     """
     try:
-<<<<<<< HEAD
         response = make_response(jsonify({"msg": "Logout succesfully"}), 200)
         unset_access_cookies(response)
         unset_jwt_cookies(response)
-=======
-        token = get_jwt()
-        await token_service.blacklist_token(token)
-        response = make_response(jsonify({"msg": "Logout succesfully"}), 200)
-        unset_access_cookies(response)
->>>>>>> 2d9e69f7b091b216dfb092e9f16c0d54da666969
         return response
     except Exception as error:
         return {"error": (str(error))}, 400
