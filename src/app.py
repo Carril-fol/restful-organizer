@@ -16,10 +16,7 @@ app.config.from_pyfile("settings.py")
 jwt.init_app(app)
 
 # Flask CORS
-cors.init_app(app, supports_credentials=True, origins="*")
-
-# Flask CORS
-cors.init_app(app, supports_credentials=True, origins=["http://localhost:5173"])
+cors.init_app(app, supports_credentials=True, origins="https://organizer-app-svod.onrender.com")
 
 # Endpoints
 app.register_blueprint(auth_blueprint)
@@ -27,4 +24,5 @@ app.register_blueprint(folder_blueprint)
 app.register_blueprint(task_blueprint)
 
 if __name__ == "__main__":
-    start_server(app)
+    #start_server(app)
+    app.run("0.0.0.0", port=8000)
