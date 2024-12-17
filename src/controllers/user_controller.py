@@ -103,8 +103,8 @@ async def login():
         access_token = create_access_token(user_exists)
         refresh_token = create_refresh_token(user_exists)
         response = make_response({"msg": "Login successful"}, 200)
-        set_access_cookies(response, access_token, domain=os.getenv("JWT_COOKIE_DOMAIN"))
-        set_refresh_cookies(response, refresh_token, domain=os.getenv("JWT_COOKIE_DOMAIN"))
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
         return response
     except UserNotFoundException as error:
         return {"error": (str(error))}, 404
