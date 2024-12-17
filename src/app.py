@@ -16,7 +16,7 @@ app.config.from_pyfile("settings.py")
 jwt.init_app(app)
 
 # Flask CORS
-cors.init_app(app, supports_credentials=True, origins="*", methods="*")
+cors.init_app(app, supports_credentials=True, origins="*", methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
 
 # Endpoints
 app.register_blueprint(auth_blueprint)
