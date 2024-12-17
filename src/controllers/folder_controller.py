@@ -46,7 +46,7 @@ async def create_folder():
     return make_response({"status": "Created"}, 201)
 
 @folder_blueprint.route("/", methods=["GET"])
-@jwt_required()
+#@jwt_required()
 async def get_folders_from_user():
     """
     Example:
