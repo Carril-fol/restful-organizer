@@ -16,7 +16,7 @@ app.config.from_pyfile("settings.py")
 jwt.init_app(app)
 
 # Flask CORS
-cors.init_app(app, supports_credentials=True, origins=["https://organizer-app-omega.vercel.app/", "*", "https://organizer-app-ruck.onrender.com"])
+cors.init_app(app, supports_credentials=True, origins="*", methods="*")
 
 # Endpoints
 app.register_blueprint(auth_blueprint)
