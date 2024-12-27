@@ -7,10 +7,10 @@ from exceptions.user_exceptions import PasswordDontContainSpecialCharecters
 
 class UserModel(BaseModel):
     id: Optional[ObjectId] = Field(default_factory=ObjectId, alias="_id")
-    first_name: str
-    last_name: str
-    email: EmailStr
-    password: str
+    first_name: Optional[str]
+    last_name: Optional[str]
+    email: Optional[EmailStr]
+    password: Optional[str]
     is_verified: bool = False
     is_authenticated: bool = False
     is_admin: bool = False
