@@ -67,7 +67,7 @@ class UserRepository:
         user_data = self.user_collection.find_one(user_dict_email)
         return user_data
 
-    def update_user(self, user_id: ObjectId, user_model_instance: UserModel) -> UpdateResult:
+    async def update_user(self, user_id: str, data: dict) -> UpdateResult:
         """  
         Replaces new information in a record where it matches the ID entered.
 
@@ -80,7 +80,6 @@ class UserRepository:
         -------
         UpdateResult: a instance from the user with the data updated
         """
-        user_dict_id = {"_id": user_id}
-        user_new_data_dict = user_model_instance.model_dump(by_alias=True)
-        user_update = self.user_collection.update_one(user_dict_id, user_new_data_dict)
-        return user_update
+        user_dict_id = {"_id": ObjectId(user_id)}
+        user_dict_formated = {"$set": data}
+        return self.user_collection.update_one(user_dict_id, user_dict_formated)
