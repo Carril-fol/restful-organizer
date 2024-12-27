@@ -1,4 +1,3 @@
-import os
 from flask import (
     Blueprint, 
     request, 
@@ -15,6 +14,7 @@ from flask_jwt_extended import (
     set_refresh_cookies,
     unset_jwt_cookies
 )
+
 from services.user_service import UserService
 from exceptions.user_exceptions import UserNotFoundException
 
@@ -118,7 +118,7 @@ async def detail_user_requested():
     """
     Example:
 
-    GET: /users/api/v1/<user_id>
+    GET: /users/api/v1/detail
     ```
     Cookie Authorization:
     {
@@ -213,5 +213,16 @@ def refresh_token():
         set_access_cookies(response, new_access_token)
         set_refresh_cookies(response, new_refresh_token)
         return response
+    except Exception as error:
+        return make_response({"error": error}, 400)
+    
+@auth_blueprint.route("/update", methods=["PATCH", "PUT"])
+@jwt_required()
+async def update_user():
+    try:
+        token_data = get_jwt_identity()
+        data = request.get_json()
+        await user_service.update_user(token_data, data)
+        return make_response({"status": "Updated"}, 200)
     except Exception as error:
         return make_response({"error": error}, 400)
