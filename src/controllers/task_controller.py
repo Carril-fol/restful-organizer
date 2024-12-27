@@ -18,7 +18,7 @@ async def create_task(folder_id: str):
     """
     Example:
 
-    POST: /tasks/api/v1/<folder_id>
+    POST: /tasks/api/v1/create/<folder_id>
     ```
     Application data:
     {
@@ -56,7 +56,7 @@ async def delete_task(task_id: str):
     """
     Example:
 
-    DELETE: /tasks/api/v1/<task_id>
+    DELETE: /tasks/api/v1/delete/<task_id>
     ```
     Successful response (Code 200 - OK):
     {
@@ -82,7 +82,7 @@ async def update_task(task_id: str):
     """
         Example:
 
-        PUT: /tasks/api/v1/<task_id>
+        PUT: /tasks/api/v1/update/<task_id>
         ```
         Application data:
         {
