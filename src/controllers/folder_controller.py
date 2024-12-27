@@ -46,7 +46,7 @@ async def create_folder():
     return make_response({"status": "Created"}, 201)
 
 @folder_blueprint.route("/", methods=["GET"])
-@jwt_required(optional=True)
+@jwt_required()
 async def get_folders_from_user():
     """
     Example:
@@ -77,7 +77,7 @@ async def detail_folder(folder_id: str):
     """
     Example:
 
-    GET: /folders/api/v1/<folder_id>
+    GET: /folders/api/v1/detail/<folder_id>
     ```
     Successful response (Code 200 - OK):
     {
@@ -130,7 +130,7 @@ async def update_folder(folder_id: str):
     """
     Example:
 
-    PUT: /folders/api/v1/<folder_id>
+    PUT: /folders/api/v1/update/<folder_id>
     ```
     Application data:
     {
@@ -170,7 +170,7 @@ async def delete_folder(folder_id: str):
     """
     Example:
 
-    DELETE: /folders/api/v1/<folder_id>
+    DELETE: /folders/api/v1/delete/<folder_id>
     ```
     Successful response (Code 200 - OK):
     {
