@@ -86,8 +86,7 @@ class UserService:
         """
         if password != confirm_password:
             raise PasswordDontMatch()
-        password_hash = await self._hash_password(password)
-        return password_hash
+        return await self._hash_password(password)
     
     async def _check_user_exists_by_id(self, user_id: str):
         """
@@ -200,5 +199,22 @@ class UserService:
             raise UserNotFoundException()
         await self._verify_password(user["password"], data["password"])
         user_model_dump_json = self._model_dump_json(user, True)
-        user_format_json = self._format_model_in_json(user_model_dump_json)
-        return user_format_json
+        return self._format_model_in_json(user_model_dump_json)
+    
+    async def update_user(self, token: dict, data: dict):
+        """
+        Update the current data from the user.
+
+        Args:
+        ----
+        token (dict): A dictionary with user token information.
+        data (dict): A dictionary with the new data from the user.
+        
+        Returns:
+        -------
+        UpdateResult: A instance from UpdateResult of Pymongo.
+        """
+        user_id = self.get_user_id_requeted(token)
+        if not await self._check_user_exists_by_id(user_id):
+            raise UserNotFoundException()
+        return await self.user_repository.update_user(user_id, data)
