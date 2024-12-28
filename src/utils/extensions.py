@@ -1,7 +1,11 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+
+# Loading environment variables
+load_dotenv()
 
 # Flask
 # https://flask.palletsprojects.com/en/stable/
@@ -16,7 +20,7 @@ jwt = JWTManager(app)
 cors = CORS(
     app, 
     supports_credentials=True, 
-    origins=["https://organizer-app-ruck.onrender.com", "http://localhost:5173"],
+    origins=os.getenv("CORS_ORIGIN", "http://localhost:5173"),
     methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Requested-With", "application/json"]
 )
