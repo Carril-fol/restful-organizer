@@ -20,7 +20,7 @@ jwt = JWTManager(app)
 cors = CORS(
     app, 
     supports_credentials=True, 
-    origins=os.getenv("CORS_ORIGIN", "http://localhost:5173"),
+    origins=os.getenv("CORS_ORIGIN"),
     methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Requested-With", "application/json"]
 )
