@@ -8,12 +8,12 @@ class TaskModel(BaseModel):
     id: Optional[ObjectId] = Field(default_factory=ObjectId, alias="_id")
     name: str
     body: Optional[str] = None
-    status: Optional[Literal["Completed", "Not Completed", "In Process"]]
+    status: Optional[Literal["Completo", "Incompleto", "En Proceso"]]
     folder_id: ObjectId = Field(alias="folder_id")
 
     @field_validator("status")
     def valid_status(cls, value):
-        status_list = ["Completed", "Not Completed", "In Process"]
+        status_list = ["Completo", "Incompleto", "En Proceso"]
         if value not in status_list:
             raise StatusNotValid()
         return value
