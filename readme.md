@@ -6,20 +6,20 @@
 
 ## 📋 Contents
 
-- [✨ Features](#✨-features)
-- [🛠️ Tech used](#🛠️-tech-used)
-- [📦 How to get the project:](#📦-how-to-get-the-project)
+- [✨ Features](#features)
+- [🛠️ Tech used](#tech-used)
+- [📦 How to get the project:](#how-to-get-the-project)
     - [Using Git (recommended)](#using-git-recommended)
     - [Using manual download ZIP](#using-manual-download-zip)
     - [Using docker](#using-docker)
-- [🌐 Deploy in render](#🌐-deploy-in-render)
+- [🌐 Deploy in render](#deploy-in-render)
 - [API endpoints](#api-endpoints)
     - [*Indication*](#indication)
   - [User related](#user-related)
   - [Folders related](#folders-related)
   - [Tasks related](#tasks-related)
 
-## ✨ Features
+## Features
 
 ### 🔒 Authentication 
 - Registration of accounts. 
@@ -34,7 +34,7 @@
 - Create tasks associated with folders. 
 - View, update and delete tasks.
 
-## 🛠️ Tech used 
+## Tech used 
 
 **Programming language**
 - Python 
@@ -48,7 +48,7 @@
 **Container**
 - Docker
 
-## 📦 How to get the project:
+## How to get the project
 #### Using Git (recommended)
 1. Navigate & open CLI into the directory where you want to put this project & Clone this project using this command.
    
@@ -70,12 +70,12 @@ docker pull carrilfol/restful-organizer
 docker run -p [PORT TO EXPOSE]:5000 carrilfol/restful-organizer
 ```
 
-## 🌐 Deploy in render
+## Deploy in render
 You can access the live version of the application here (this can be a bit burdensome since the server has to be initialized): 
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://restful-organizer.onrender.com)
 
-## API endpoints:
+## API endpoints
 
 #### *Indication*
 - [x] **Authentication required**
