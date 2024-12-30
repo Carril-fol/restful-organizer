@@ -1,61 +1,54 @@
-<h1 align="center"> Organizer API REST</h1>
+<p align="center">
+  <span style="font-size: 2.5em; font-weight: bold;">Moose Planner API</span>
+</p>
 
-**Organizer** is an API developed in Flask that provides a platform for organized folder and task management. This API allows users to efficiently structure and manage their tasks, dividing them into folders for better organization and accessibility.
+**Moose Planner** is an API developed in Flask that provides a platform for organized folder and task management. This API allows users to efficiently structure and manage their tasks, dividing them into folders for better organization and accessibility.
 
-The project implements a layered architecture, which facilitates separation of responsibilities and improves code scalability and maintainability.
+## 📋 Contents
 
-## Contents
-
-- [Features](#features)
-- [Tech used](#tech-used)
-- [How to get the project:](#how-to-get-the-project)
+- [✨ Features](#✨-features)
+- [🛠️ Tech used](#🛠️-tech-used)
+- [📦 How to get the project:](#📦-how-to-get-the-project)
     - [Using Git (recommended)](#using-git-recommended)
     - [Using manual download ZIP](#using-manual-download-zip)
     - [Using docker](#using-docker)
-- [Deploy in render:](#deploy-in-render)
-- [API endpoints:](#api-endpoints)
+- [🌐 Deploy in render](#🌐-deploy-in-render)
+- [API endpoints](#api-endpoints)
     - [*Indication*](#indication)
   - [User related](#user-related)
   - [Folders related](#folders-related)
   - [Tasks related](#tasks-related)
 
-## Features
+## ✨ Features
 
-1. Authentication:
+### 🔒 Authentication 
+- Registration of accounts. 
+- Login and closing.
+- Refreshment of tokens. 
 
-  * Register account
-  * Log in
-  * Log out
+### 📂 Folders Management 
+- Create, update and delete folders. 
+- See folder details. 
 
-2. Folder Management:
+### ✅ Task Management 
+- Create tasks associated with folders. 
+- View, update and delete tasks.
 
-  * Create folders
-  * Update folders
-  * Delete folders
-  * View folder details
-
-3. Task Management:
-
-  * Create tasks associated with folders
-  * View task details
-  * Update tasks
-  * Delete tasks
-
-## Tech used 
+## 🛠️ Tech used 
 
 **Programming language**
-- [x] Python 
+- Python 
 
 **Framework**
-- [x] Flask
+- Flask
 
 **Database**
-- [x] MongoDB
+- MongoDB
 
 **Container**
-- [x] Docker
+- Docker
 
-## How to get the project:
+## 📦 How to get the project:
 #### Using Git (recommended)
 1. Navigate & open CLI into the directory where you want to put this project & Clone this project using this command.
    
@@ -77,7 +70,7 @@ docker pull carrilfol/restful-organizer
 docker run -p [PORT TO EXPOSE]:5000 carrilfol/restful-organizer
 ```
 
-## Deploy in render:
+## 🌐 Deploy in render
 You can access the live version of the application here (this can be a bit burdensome since the server has to be initialized): 
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://restful-organizer.onrender.com)
@@ -92,7 +85,7 @@ You can access the live version of the application here (this can be a bit burde
 - [ ] [Register](docs/auth/UserRegisterResource.md): `POST localhost:[PORT]/users/api/v1/register`
 - [ ] [Login](docs/auth/UserLoginResource.md): `POST localhost:[PORT]/users/api/v1/login`
 - [x] [Logout](docs/auth/UserLogoutResource.md): `POST localhost:[PORT]/users/api/v1/logout`
-- [x] [Get user info](docs/auth/UserDetailsResource.md): `GET localhost:[PORT]/users/api/v1/<user_id>`
+- [x] [Get user info](docs/auth/UserDetailsResource.md): `GET localhost:[PORT]/users/api/v1/detail`
 - [x] [Refresh token](docs/auth/RefreshTokenResource.md): `POST localhost:[POST]/users/api/v1/refresh`
 
 ### Folders related
