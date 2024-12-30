@@ -71,9 +71,11 @@ docker run -p [PORT TO EXPOSE]:5000 carrilfol/restful-organizer
 ```
 
 ## Deploy in render
-You can access the live version of the application here (this can be a bit burdensome since the server has to be initialized): 
+You can access the live version of the application here and make requests from Postman or Insomnia.
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://restful-organizer.onrender.com)
+
+>Note: The server may take time to start because it is hosted on the free layer.
 
 ## API endpoints
 
