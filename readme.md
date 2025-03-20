@@ -1,4 +1,4 @@
-# Moose Planner
+# Moose Planner API
 
 **Moose Planner** is an API developed in Flask that provides a platform for organized folder and task management. This API allows users to efficiently structure and manage their tasks, dividing them into folders for better organization and accessibility.
 
